@@ -228,9 +228,13 @@ class task_gen(object):
 
 	# TODO waf 1.6: always set the environment
 	# TODO waf 1.6: create_task(self, name, inputs, outputs)
-	def create_task(self, name, env=None):
+	def create_task(self, name, src=None, tgt=None, env=None):
 		env = env or self.env
 		task = Task.TaskBase.classes[name](env.copy(), generator=self)
+		if src:
+			task.set_inputs(src)
+		if tgt:
+			task.set_outputs(tgt)
 		self.tasks.append(task)
 		return task
 
@@ -260,7 +264,7 @@ class task_gen(object):
 		#make sure dirnames is a list helps with dirnames with spaces
 		dirnames = self.to_list(dirnames)
 
-		ext_lst = exts or self.mappings.keys() + task_gen.mappings.keys()
+		ext_lst = exts or list(self.mappings.keys()) + list(task_gen.mappings.keys())
 
 		for name in dirnames:
 			anode = self.path.find_dir(name)
@@ -375,9 +379,7 @@ def declare_chain(name='', action='', ext_in='', ext_out='', reentrant=1, color=
 			# XXX: useless: it will fail on Utils.to_list above...
 			raise Utils.WafError("do not know how to process %s" % str(ext))
 
-		tsk = self.create_task(name)
-		tsk.set_inputs(node)
-		tsk.set_outputs(out_source)
+		tsk = self.create_task(name, node, out_source)
 
 		if node.__class__.bld.is_install:
 			tsk.install = install
@@ -403,6 +405,7 @@ Intelligent compilers binding aspect-oriented programming and parallelization, w
 """
 def taskgen(func):
 	setattr(task_gen, func.__name__, func)
+	return func
 
 def feature(*k):
 	def deco(func):
@@ -511,7 +514,7 @@ def exec_rule(self):
 
 	if getattr(self, 'target', None):
 		cls.quiet = True
-		tsk.outputs=[self.path.find_or_declare(x) for x in self.to_list(self.target)]
+		tsk.outputs = [self.path.find_or_declare(x) for x in self.to_list(self.target)]
 
 	if getattr(self, 'source', None):
 		cls.quiet = True
@@ -550,8 +553,8 @@ def sequence_order(self):
 	there is also an awesome trick for executing the method in last position
 
 	to use:
-	bld.new_task_gen(features='javac seq')
-	bld.new_task_gen(features='jar seq')
+	bld(features='javac seq')
+	bld(features='jar seq')
 
 	to start a new sequence, set the attribute seq_start, for example:
 	obj.seq_start = True

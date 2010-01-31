@@ -12,11 +12,10 @@ from Logs import error
 """
 Usage:
 
-bld.new_task_gen(features='intltool_in', source='a.po b.po', podir='po', cache='.intlcache', flags='')
-
-
+bld(features='intltool_in', source='a.po b.po', podir='po', cache='.intlcache', flags='')
 
 """
+
 class intltool_in_taskgen(TaskGen.task_gen):
 	"""deprecated"""
 	def __init__(self, *k, **kw):
@@ -42,10 +41,7 @@ def iapply_intltool_in_f(self):
 		self.env['INTLPODIR'] = podirnode.srcpath(self.env)
 		self.env['INTLFLAGS'] = getattr(self, 'flags', ['-q', '-u', '-c'])
 
-		task = self.create_task('intltool')
-		task.set_inputs(node)
-		task.set_outputs(node.change_ext(''))
-
+		task = self.create_task('intltool', node, node.change_ext(''))
 		task.install_path = self.install_path
 
 class intltool_po_taskgen(TaskGen.task_gen):

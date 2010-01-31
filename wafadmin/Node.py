@@ -6,15 +6,15 @@
 Node: filesystem structure, contains lists of nodes
 
 IMPORTANT:
-1. Each file/folder is represented by exactly one node
+1. Each file/folder is represented by exactly one node.
 
 2. Most would-be class properties are stored in Build: nodes to depend on, signature, flags, ..
-unused class members increase the .wafpickle file size sensibly with lots of objects
+unused class members increase the .wafpickle file size sensibly with lots of objects.
 
-3. The build is launched from the top of the build dir (for example, in _build_/)
+3. The build is launched from the top of the build dir (for example, in _build_/).
 
 4. Node should not be instantiated directly.
-Each instance of Build.BuildContext has a Node sublass.
+Each instance of Build.BuildContext has a Node subclass.
 (aka: 'Nodu', see BuildContext initializer)
 The BuildContext is referenced here as self.__class__.bld
 Its Node class is referenced here as self.__class__
@@ -256,7 +256,6 @@ class Node(object):
 						return None
 		return current
 
-	# FIXME: remove in waf 1.6 ?
 	def ensure_dir_node_from_path(self, lst):
 		"used very rarely, force the construction of a branch of node instance for representing folders"
 
@@ -278,7 +277,6 @@ class Node(object):
 					current = self.__class__(name, prev, DIR)
 		return current
 
-	# FIXME: remove in waf 1.6
 	def exclusive_build_node(self, path):
 		"""
 		create a hierarchy in the build dir (no source folders) for ill-behaving compilers

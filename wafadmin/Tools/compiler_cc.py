@@ -11,7 +11,7 @@ c_compiler = {
 	'win32':  ['msvc', 'gcc'],
 	'cygwin': ['gcc'],
 	'darwin': ['gcc'],
-	'aix5':   ['gcc'],
+	'aix':    ['xlc', 'gcc'],
 	'linux':  ['gcc', 'icc', 'suncc'],
 	'sunos':  ['gcc', 'suncc'],
 	'irix':   ['gcc'],
@@ -44,6 +44,9 @@ def detect(conf):
 				conf.env['COMPILER_CC'] = compiler
 				break
 			conf.check_message(compiler, '', False)
+			break
+	else:
+		conf.fatal('could not configure a c compiler!')
 
 def set_options(opt):
 	build_platform = Utils.unversioned_sys_platform()
@@ -56,12 +59,4 @@ def set_options(opt):
 
 	for c_compiler in test_for_compiler.split():
 		opt.tool_options('%s' % c_compiler, option_group=cc_compiler_opts)
-
-	"""opt.add_option('-d', '--debug-level',
-	action = 'store',
-	default = ccroot.DEBUG_LEVELS.RELEASE,
-	help = "Specify the debug level, does nothing if CFLAGS is set in the environment. [Allowed Values: '%s']" % "', '".join(ccroot.DEBUG_LEVELS.ALL),
-	choices = ccroot.DEBUG_LEVELS.ALL,
-	dest = 'debug_level')"""
-
 
