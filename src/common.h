@@ -16,7 +16,7 @@
 #define COMMON_H
 
 #include "xmmsclient/xmmsclient.h"
-#include "xmmsclientpriv/xmmsclient.h"
+/* #include "xmmsclientpriv/xmmsclient.h" */
 #include "xmmsc/xmmsc_idnumbers.h"
 
 #define XMMS_COLLECTION_PARSER_DEFAULT_NAMESPACE "Collections"
@@ -46,6 +46,7 @@ struct _xm_context
   void *scanner;
   xmmsv_coll_t *result;
   xm_parser_mode_t mode;
+  xm_string_t *scan_str;
 };
 
 struct _xm_sequence
@@ -69,6 +70,25 @@ xm_context_new();
 void
 xm_context_store_result(xm_context_t *context, xmmsv_coll_t *result);
 
+void
+xm_context_string_init(xm_context_t *context);
+
+char *
+xm_context_string_dup(xm_context_t *ctx);
+
+int
+xm_context_string_to_int(xm_context_t *ctx);
+
+void
+xm_context_string_append_patchar(xm_context_t *ctx, const char *pat);
+
+void
+xm_context_string_append_digits(xm_context_t *ctx, const char *digits);
+
+void
+xm_context_string_append_str(xm_context_t *ctx, const char *str);
+
+
 xmmsv_coll_t *
 xm_build_union(xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op);
 
@@ -90,7 +110,7 @@ xm_build_unary(xm_context_t *ctx, int unary_op, const char *property);
 
 xmmsv_coll_t *
 xm_build_binary_with_string(xm_context_t *ctx, int binary_op,
-                            const char *property, const char *string);
+                            const char *property, xm_string_t *string);
 
 xmmsv_coll_t *
 xm_build_binary_with_integer(xm_context_t *ctx, int binary_op,
@@ -107,6 +127,9 @@ xm_string_free(xm_context_t *ctx, xm_string_t *xstr);
 
 xm_string_t *
 xm_string_new_from_integer(xm_context_t *ctx, int ivalue);
+
+void
+xm_string_append(xm_string_t *xstr, const char *str);
 
 xm_sequence_t *
 xm_range_new(xm_context_t *ctx, int start_range, int end_range);

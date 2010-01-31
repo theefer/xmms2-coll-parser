@@ -22,16 +22,23 @@ def build(bld):
       includes = 'src/',
       target = APPNAME,
       uselib = "xmmsclient")
-  obj.find_sources_in_dirs('src/')
+  lib.find_sources_in_dirs('src/', ['test.c'], ['.l', '.y', '.c'])
+
+  #app = bld.new_task_gen(
+  #    features = 'cprogram cc',
+  #    includes = 'src/',
+  #    target = 'coll-test',
+  #    source = 'coll-test.c',
+  #    uselib_local = APPNAME)
 
 def configure(conf):
   conf.check_tool('misc gnu_dirs gcc')
-  conf.check_tool('flex bison', mandatory=True)
+  conf.check_tool('flex bison')
   conf.check_cfg(
       package='xmms2-client',
       atleast_version="0.6",
       uselib_store="xmmsclient",
-      args='--flags --libs',
+      args='--cflags --libs',
       mantadoty=True)
 
 def set_options(opt):

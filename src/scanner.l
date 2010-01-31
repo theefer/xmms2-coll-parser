@@ -21,7 +21,7 @@
 %{
 #include <string.h>
 #include "common.h"
-#include "y.tab.h"
+#include "parser.tab.h"
 
 #ifdef YY_BREAK
 # undef YY_BREAK
@@ -116,9 +116,9 @@ NOPFILSP  [^:~<>[:space:]]
 	return TOKEN_PROP_LONG;
 }
 
-<INITIAL>/. {
+<INITIAL>""/. {
 	/* Default case: If no token matches, assume it is a string or a pattern. */
-	BEGIN(string)
+	BEGIN(string);
 	xm_context_string_init(yyextra);
 	break;
 }
@@ -175,13 +175,13 @@ NOPFILSP  [^:~<>[:space:]]
 <string,stringQ,stringSQ>{SP}+ {
 	BEGIN(INITIAL);
 	switch (xm_context_string_get_type(yyextra)) {
-		case XM_STRING:
+		case XM_STRING_TYPE_STRING:
 			yylval->sval = xm_context_string_dup(yyextra);
 			return TOKEN_STRING;
-		case XM_PATTERN:
+		case XM_STRING_TYPE_PATTERN:
 			yylval->sval = xm_context_string_dup(yyextra);
 			return TOKEN_PATTERN;
-		case XM_INTEGER:
+		case XM_STRING_TYPE_INTEGER:
 			yylval->ival = xm_context_string_to_int(yyextra);
 			return TOKEN_INTEGER;
 		default:

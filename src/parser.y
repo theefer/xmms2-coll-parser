@@ -52,7 +52,7 @@
 %type <sval> property
 %type <coll> operation and_op or_op expr filter unary_filter binary_filter
 %type <xstr> string
-%type <seq> sequence seqrange
+%type <seq> sequence seqrange sequence_rev
 
 %start s
 
@@ -102,7 +102,7 @@ expr : TOKEN_SYMBOL_ID sequence {
   $$ = $2;
 }
      | TOKEN_OPSET_NOT expr {
-  $$ = xm_build_complement(context, $1);
+  $$ = xm_build_complement(context, $2);
 }
      | TOKEN_REFERENCE TOKEN_STRING {
   $$ = xm_build_reference(context, $2);
@@ -119,14 +119,14 @@ filter : unary_filter {
        | string {
   /* TODO: use appropriate enum value for filter. */
   /* Behave like  'TOKEN_OPFIL_EQ property' rule in binary_filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $3);
+  $$ = xm_build_binary_with_string(context, 0, NULL, $1);
   xm_string_free(context, $1);
 }
 
 unary_filter : TOKEN_OPFIL_HAS property {
   /* TODO: get appropriate enum value for 'HAS' filter. */
-  $$ = xm_build_unary(context, 0, $1);
-  free($1); /* Required! */
+  $$ = xm_build_unary(context, 0, $2);
+  free($2); /* Required! */
 }
                ;
 
@@ -164,12 +164,12 @@ binary_filter : property TOKEN_OPFIL_EQ string {
 }
               | TOKEN_OPFIL_EQ string {
   /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $3);
+  $$ = xm_build_binary_with_string(context, 0, NULL, $2);
   xm_string_free(context, $2);
 }
               | TOKEN_OPFIL_MATCH string {
   /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $3);
+  $$ = xm_build_binary_with_string(context, 0, NULL, $2);
   xm_string_free(context, $2);
 }
                 ;
@@ -201,7 +201,7 @@ sequence : sequence_rev {
          
 sequence_rev : sequence_rev TOKEN_IDSEQ_SEP seqrange {
   /* It is faster to build the sequence in reverse order. */
-  $$ = xm_sequence_prepend(context, $1, $3);
+  $$ = xm_sequence_prepend_range(context, $1, $3);
 }
                | seqrange {
 	$$ = $1;
