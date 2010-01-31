@@ -158,18 +158,19 @@ NOPFILSP  [^:~<>[:space:]]
 	xm_context_string_append_str(yyextra, yytext);
 	break;
 }
+<stringQ>["] {
+	BEGIN(string);
+	break; }
 <stringQ>{STRQ}*/["] {
 	xm_context_string_append_str(yyextra, yytext);
 	break;
 }
-<stringQ>["] {
-	BEGIN(string);
-	break; }
-<stringSQ>{STRSQ}*/['] {
-	xm_context_string_append_str(yyextra, yytext);
+<stringSQ>['] {
+  BEGIN(string);
 	break;
 }
-<stringSQ>['] {
+<stringSQ>{STRSQ}*/['] {
+	xm_context_string_append_str(yyextra, yytext);
 	break;
 }
 <string,stringQ,stringSQ>{SP}+ {
