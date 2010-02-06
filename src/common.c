@@ -275,7 +275,7 @@ xmmsv_coll_t *
 xm_build_reference(xm_context_t *ctx, const char *refname)
 {
 	char *namespace;
-	const char *ref;
+	const char *ref = NULL;
 	xmmsv_coll_t *coll;
 
 	namespace = xm_strsplit_namespace(refname, &ref);
@@ -299,8 +299,8 @@ xmmsv_coll_t *
 xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 {
 	xmmsv_coll_t *coll;
-	int len, i, j, last;
-	int *idlist;
+	unsigned int len, i, j, last;
+	unsigned int *idlist;
 	xm_sequence_t *iter;
 
 	for (len = 0, iter = seq; iter; iter = iter->next) {
@@ -308,7 +308,7 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 			len += seq->end - seq->start + 1;
 		}
 	}
-	idlist = xm_new(int, len + 1);
+	idlist = xm_new(unsigned int, len + 1);
 	for (i = 0, iter = seq; iter; iter = iter->next) {
 		for (j = iter->start; j <= iter->end; j++) {
 			idlist[i] = j;
@@ -316,7 +316,7 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 		}
 	}
 	idlist[i] = 0;
-	qsort(idlist, len, sizeof (int), xm_idlist_sort);
+	qsort(idlist, len, sizeof (unsigned int), xm_idlist_sort);
 
 	/* Now removes dupplicated entries. */
 	for (last=0,j=0,i=0; i < len; i++) {
@@ -329,7 +329,7 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 		}
 	}
 	idlist[j] = 0;
-	idlist = xm_renew(idlist, int, j+1);
+	idlist = xm_renew(idlist, unsigned int, j+1);
 
 	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_IDLIST);
 	xmmsv_coll_set_idlist(coll, idlist);

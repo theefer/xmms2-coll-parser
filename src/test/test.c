@@ -19,7 +19,7 @@
  */
 
 #include <glib.h>
-#include <gio/gio.h>
+#include <glib/gprintf.h>
 #include "coll-parser.h"
 
 static void

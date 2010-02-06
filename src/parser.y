@@ -31,7 +31,7 @@
 %lex-param {void *scanner}
 
 %union {
-	int ival;
+	unsigned int ival;
 	xm_boxed_t *coll;
 	xm_string_t *xstr;
 	xm_sequence_t *seq;
@@ -58,6 +58,9 @@
 %{
 void
 xm_yyerror(YYLTYPE *locp, xm_context_t *ctx, void *scanner, const char *msg);
+
+int
+xm_yylex(YYSTYPE *lval, YYLTYPE *lloc, void*scanner);
 
 #define XM_BOX(coll) \
 	(xm_context_boxed_new(context, (coll), (xm_destroy_func) xmmsv_coll_unref))

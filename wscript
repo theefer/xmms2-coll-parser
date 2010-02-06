@@ -4,7 +4,7 @@
 
 import os, sys
 
-import Utils
+import Utils, Options
 
 APPNAME = 'xm-coll-parser'
 VERSION = '0.1'
@@ -49,10 +49,20 @@ def configure(conf):
     conf.env['BUILD_TEST'] = True
   else:
     conf.env['BUILD_TEST'] = False
+  flags_list = Utils.to_list(conf.env['CCFLAGS'])
+  if Options.options.debug:
+    conf.env['CCFLAGS'] = '-O0 -g3 -Wall -pedantic --std=gnu99'.split()
+  else:
+    conf.env['CCFLAGS'] = '-O2 -Wall'.split()
+  # Command-line cflags, such as -O* takes priority when they appear last.
+  for c in flags_list:
+    conf.env.append_unique('CCFLAGS', c)
 
 def set_options(opt):
   opt.tool_options('gnu_dirs')
   opt.tool_options('gcc')
+  opt.add_option('--debug', action="store_true", dest='debug', default=False,
+                 help="Build with debug CFLAGS.")
 
 def shutdown():
   pass

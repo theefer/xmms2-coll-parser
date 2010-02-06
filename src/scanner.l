@@ -16,6 +16,8 @@
 %option bison-bridge
 %option bison-locations
 %option noyywrap
+%option nounput
+%option noinput
 %option prefix="xm_yy"
 %option extra-type="xm_context_t *"
 
@@ -139,7 +141,7 @@ NOPFILSP  [^:~<>[:space:]]
 }
 
 <idseq>[[:digit:]]+ {
-	yylval->ival = atoi(yytext);
+	yylval->ival = (unsigned int) atoi(yytext);
 	return TOKEN_INTEGER;
 }
 <idseq>"-" {
@@ -209,6 +211,8 @@ NOPFILSP  [^:~<>[:space:]]
 			return TOKEN_ERR;
 	}
 }
+
+<*>. { return TOKEN_ERR; }
 
 %%
 

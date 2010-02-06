@@ -106,8 +106,8 @@ typedef struct xm_sequence xm_sequence_t;
 
 struct xm_sequence {
 	xm_disposable_t base;
-	int start;
-	int end;
+	unsigned int start;
+	unsigned int end;
 	xm_sequence_t *prev;
 	xm_sequence_t *next;
 };
@@ -116,13 +116,7 @@ xm_sequence_t *
 xm_sequence_new();
 
 void
-xm_sequence_set_range(xm_sequence_t *seq, int start, int end);
-
-void
-xm_sequence_set_start(xm_sequence_t *seq, int start);
-
-void
-xm_sequence_set_start(xm_sequence_t *seq, int end);
+xm_sequence_set_range(xm_sequence_t *seq, unsigned int start, unsigned int end);
 
 xm_sequence_t *
 xm_sequence_prepend(xm_sequence_t *seq, xm_sequence_t *item);
@@ -133,11 +127,8 @@ xm_sequence_reverse(xm_sequence_t *seq);
 xm_sequence_t *
 xm_sequence_get_first(xm_sequence_t *seq);
 
-xm_sequence_t *
-xm_sequence_ref(xm_sequence_t *seq);
-
 void
-xm_sequence_unref(xm_sequence_t *seq);
+xm_sequence_destroy(xm_sequence_t *seq);
 
 
 /* Boxed struct. */

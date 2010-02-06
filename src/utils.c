@@ -182,32 +182,13 @@ xm_sequence_new()
 }
 
 void
-xm_sequence_set_range(xm_sequence_t *seq, int start, int end)
+xm_sequence_set_range(xm_sequence_t *seq, unsigned int start, unsigned int end)
 {
 	if (seq) {
 		if (start <= 0) {
 			start = 1;
 		}
 		seq->start = start;
-		seq->end = end;
-	}
-}
-
-void
-xm_sequence_set_start(xm_sequence_t *seq, int start)
-{
-	if (seq) {
-		if (start <= 0) {
-			start = 1;
-		}
-		seq->start = start;
-	}
-}
-
-void
-xm_sequence_set_end(xm_sequence_t *seq, int end)
-{
-	if (seq) {
 		seq->end = end;
 	}
 }
