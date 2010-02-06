@@ -1,5 +1,5 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2009 Raphaël Bois
+ *  Copyright (C) 2010 Raphaël Bois
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -12,34 +12,34 @@
  *  Lesser General Public License for more details.
  */
 
-%pure-parser
+%{
+#include <stdio.h> /* snprintf */
+#include <string.h> /* strdup */
+
+#include "common.h"
+%}
+
+%define api.pure
+%name-prefix="xm_yy"
 
 %locations
 %defines
 %error-verbose
 
-%{
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-
-#include "common.h"
-%}
-
 %parse-param {xm_context_t *context}
+%parse-param {void *scanner}
 %lex-param {void *scanner}
 
 %union {
 	int ival;
-	char *sval;
-	xmmsv_coll_t  *coll;
-	xm_string_t   *xstr;
+	xm_boxed_t *coll;
+	xm_string_t *xstr;
 	xm_sequence_t *seq;
 }
 
 %token <ival> TOKEN_INTEGER
-%token <sval> TOKEN_PROP_SHORT TOKEN_PROP_LONG TOKEN_STRING TOKEN_PATTERN
+%token <xstr> TOKEN_PROP_SHORT TOKEN_PROP_LONG
+%token <xstr> TOKEN_STRING TOKEN_PATTERN TOKEN_NUMERIC
 %token TOKEN_GROUP_OPEN TOKEN_GROUP_CLOSE
 %token TOKEN_SYMBOL_ID TOKEN_OPFIL_HAS TOKEN_REFERENCE
 %token TOKEN_OPFIL_EQ TOKEN_OPFIL_MATCH TOKEN_OPFIL_LE TOKEN_OPFIL_GE
@@ -49,169 +49,241 @@
 
 %token TOKEN_ERR
 
-%type <sval> property
+%type <xstr> property string integer
 %type <coll> operation and_op or_op expr filter unary_filter binary_filter
-%type <xstr> string
 %type <seq> sequence seqrange sequence_rev
 
 %start s
 
 %{
-#define scanner (context->scanner)
+void
+xm_yyerror(YYLTYPE *locp, xm_context_t *ctx, void *scanner, const char *msg);
+
+#define XM_BOX(coll) \
+	(xm_context_boxed_new(context, (coll), (xm_destroy_func) xmmsv_coll_unref))
+
+#define COLL(boxed) ((xmmsv_coll_t *)((boxed)->data))
+#define COLLREF(boxed) (xmmsv_coll_ref(COLL(boxed)))
 %}
 
 %%
 
-s : operation {
-	xm_context_store_result(context, $1);
-}
-    ;
+s :
+	operation {
+		xm_context_store_result(context, COLL($1));
+		xm_boxed_unref($1);
+	}
+;
 
-operation : or_op {
-	$$ = $1;
-}
-            ;
+operation :
+	or_op {
+		$$ = $1;
+	}
+;
 
-or_op : or_op TOKEN_OPSET_OR and_op {
-  $$ = xm_build_union(context, $1, $3);
-}
-      | and_op {
-	$$ = $1;
-}
-        ;
+or_op :
+	or_op TOKEN_OPSET_OR and_op {
+		$$ = XM_BOX(xm_build_union(context, COLLREF($1), COLLREF($3)));
+		xm_boxed_unref($1);
+		xm_boxed_unref($3);
+	}
+|	and_op {
+		$$ = $1;
+	}
+;
 
-and_op : and_op expr {
-  $$ = xm_build_intersection(context, $1, $2);
-}
-       | and_op TOKEN_OPSET_AND expr {
-  $$ = xm_build_intersection(context, $1, $3);
-}
-       | expr {
-	$$ = $1;
-}
-       ;
+and_op :
+	and_op expr {
+		$$ = XM_BOX(xm_build_union(context, COLLREF($1), COLLREF($2)));
+		xm_boxed_unref($1);
+		xm_boxed_unref($2);
+	}
+|	and_op TOKEN_OPSET_AND expr {
+		$$ = XM_BOX(xm_build_intersection(context, COLLREF($1), COLLREF($3)));
+		xm_boxed_unref($1);
+		xm_boxed_unref($3);
+	}
+|	expr {
+		$$ = $1;
+	}
+;
 
-expr : TOKEN_SYMBOL_ID sequence {
-  $$ = xm_build_idlist(context, $2);
-  xm_sequence_free(context, $2);
-}
-     | filter {
-	$$ = $1;
-}
-     | TOKEN_GROUP_OPEN operation TOKEN_GROUP_CLOSE {
-  $$ = $2;
-}
-     | TOKEN_OPSET_NOT expr {
-  $$ = xm_build_complement(context, $2);
-}
-     | TOKEN_REFERENCE TOKEN_STRING {
-  $$ = xm_build_reference(context, $2);
-  free($2);
-}
-       ;
+expr :
+	sequence {
+		$$ = XM_BOX(xm_build_idlist(context, $1));
+		xm_sequence_destroy($1);
+	}
+|	filter {
+		$$ = $1;
+	}
+|	TOKEN_GROUP_OPEN operation TOKEN_GROUP_CLOSE {
+		$$ = $2;
+	}
+|	TOKEN_OPSET_NOT expr {
+		$$ = XM_BOX(xm_build_complement(context, COLLREF($2)));
+		xm_boxed_unref($2);
+	}
+|	TOKEN_REFERENCE string {
+		$$ = XM_BOX(xm_build_reference(context, $2->value));
+		xm_string_unref($2);
+	}
+;
 
-filter : unary_filter {
-	$$ = $1;
-}
-       | binary_filter {
-	$$ = $1;
-}
-       | string {
-  /* TODO: use appropriate enum value for filter. */
-  /* Behave like  'TOKEN_OPFIL_EQ property' rule in binary_filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $1);
-  xm_string_free(context, $1);
-}
+filter :
+	unary_filter {
+		$$ = $1;
+	}
+|	binary_filter {
+		$$ = $1;
+	}
+|	string {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_EQUALS, NULL, $1));
+		xm_string_unref($1);
+	}
+;
 
-unary_filter : TOKEN_OPFIL_HAS property {
-  /* TODO: get appropriate enum value for 'HAS' filter. */
-  $$ = xm_build_unary(context, 0, $2);
-  free($2); /* Required! */
-}
-               ;
+unary_filter :
+	TOKEN_OPFIL_HAS property {
+		$$ = XM_BOX(xm_build_unary(context, XMMS_COLLECTION_TYPE_HAS, $2->value));
+		xm_string_unref($2);
+	}
+;
 
-binary_filter : property TOKEN_OPFIL_EQ string {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, $1, $3);
-  free($1);
-  xm_string_free(context, $3);
-}
-              | property TOKEN_OPFIL_MATCH string {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, $1, $3);
-  free($1);
-  xm_string_free(context, $3);
-}
-              | property TOKEN_OPFIL_LE TOKEN_INTEGER {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_integer(context, 0, $1, $3);
-  free($1);
-}
-              | property TOKEN_OPFIL_GE TOKEN_INTEGER {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_integer(context, 0, $1, $3);
-  free($1);
-}
-              | property TOKEN_OPFIL_LT TOKEN_INTEGER {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_integer(context, 0, $1, $3);
-  free($1);
-}
-              | property TOKEN_OPFIL_GT TOKEN_INTEGER {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_integer(context, 0, $1, $3);
-  free($1);
-}
-              | TOKEN_OPFIL_EQ string {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $2);
-  xm_string_free(context, $2);
-}
-              | TOKEN_OPFIL_MATCH string {
-  /* TODO: use appropriate enum value for filter. */
-  $$ = xm_build_binary_with_string(context, 0, NULL, $2);
-  xm_string_free(context, $2);
-}
-                ;
+binary_filter :
+	property TOKEN_OPFIL_EQ string {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_EQUALS, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	property TOKEN_OPFIL_MATCH string {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_MATCH, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	property TOKEN_OPFIL_LE integer {
+		$$ = XM_BOX(xm_build_binary_e(context, XMMS_COLLECTION_TYPE_SMALLER, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	property TOKEN_OPFIL_GE integer {
+		$$ = XM_BOX(xm_build_binary_e(context, XMMS_COLLECTION_TYPE_GREATER, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	property TOKEN_OPFIL_LT integer {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_SMALLER, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	property TOKEN_OPFIL_GT integer {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_GREATER, $1->value, $3));
+		xm_string_unref($1);
+		xm_string_unref($3);
+	}
+|	TOKEN_OPFIL_EQ string {
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_EQUALS, NULL, $2));
+		xm_string_unref($2);
+	}
+|	TOKEN_OPFIL_MATCH string {
+		/* TODO: use appropriate enum value for filter. */
+		$$ = XM_BOX(xm_build_binary(context, XMMS_COLLECTION_TYPE_MATCH, NULL, $2));
+		xm_string_unref($2);
+	}
+;
 
-property : TOKEN_PROP_SHORT {
-  $$ = xm_property_get_from_short(context, $1);
-  free($1);
-}
-         | TOKEN_PROP_LONG {
-  $$ = $1;
-}
-           ;
+property :
+	TOKEN_PROP_SHORT {
+		$$ = xm_property_get_from_short(context, $1);
+		xm_string_unref($1);
+	}
+|	TOKEN_PROP_LONG {
+		$$ = $1;
+	}
+;
 
-string : TOKEN_STRING {
-  $$ = xm_string_new(context, XM_STRING_TYPE_STRING, $1);
-}
-       | TOKEN_PATTERN {
-  $$ = xm_string_new(context, XM_STRING_TYPE_PATTERN, $1);
-}
-       | TOKEN_INTEGER {
-  $$ = xm_string_new_from_integer(context, $1);
-}
-         ;
+integer :
+	TOKEN_STRING {
+		xm_yyerror(&xm_yylloc, context, scanner, XM_ERROR_SEMANTIC_NOT_INTEGER);
+		xm_string_unref($1);
+		YYERROR;
+	}
+|	TOKEN_PATTERN {
+		xm_yyerror(&xm_yylloc, context, scanner, XM_ERROR_SEMANTIC_NOT_INTEGER);
+		xm_string_unref($1);
+		YYERROR;
+	}
+|	TOKEN_NUMERIC {
+		$$ = $1;
+	}
 
-sequence : sequence_rev {
-  $$ = xm_sequence_reverse(context, $1);
-}
-           ;
-         
-sequence_rev : sequence_rev TOKEN_IDSEQ_SEP seqrange {
-  /* It is faster to build the sequence in reverse order. */
-  $$ = xm_sequence_prepend_range(context, $1, $3);
-}
-               | seqrange {
-	$$ = $1;
-}
-                 ;
+string :
+	TOKEN_STRING {
+		$$ = $1;
+	}
+|	TOKEN_PATTERN {
+		$$ = $1;
+	}
+|	TOKEN_NUMERIC {
+		$$ = $1;
+	}
+;
 
-seqrange : TOKEN_INTEGER TOKEN_IDSEQ_RANGE TOKEN_INTEGER {
-  $$ = xm_range_new(context, $1, $3);
-}        | TOKEN_INTEGER {
-  $$ = xm_range_new(context, $1, $1);
-}
+sequence :
+	TOKEN_SYMBOL_ID sequence_rev {
+		$$ = xm_sequence_reverse($2);
+	}
+;
+
+sequence_rev :
+	sequence_rev TOKEN_IDSEQ_SEP seqrange {
+		/* It is faster to build the sequence in reverse order. */
+		$$ = xm_sequence_prepend($1, $3);
+	}
+|	seqrange {
+		$$ = $1;
+	}
+;
+
+seqrange :
+	TOKEN_INTEGER TOKEN_IDSEQ_RANGE TOKEN_INTEGER {
+		$$ = xm_context_sequence_new_range(context, $1, $3);
+	}
+|	TOKEN_INTEGER {
+		$$ = xm_context_sequence_new_range(context, $1, $1);
+	}
+;
 
 %%
+
+/* directly parser-related functions. */
+
+void
+xm_yyerror(YYLTYPE *locp, xm_context_t *ctx, void *scanner, const char *msg)
+{
+	int l;
+	char test;
+
+	if (ctx->error) {
+		return;
+	}
+
+	l = snprintf(&test, 1, XM_ERROR_DEFAULT_FORMAT,
+	             locp->last_line, locp->last_column, msg);
+	if (l > 0) {
+		ctx->error = malloc(l + 1);
+		snprintf(ctx->error, l + 1, XM_ERROR_DEFAULT_FORMAT,
+		         locp->last_line, locp->last_column, msg);
+	} else { /* We need to report an error no matter what. */
+		ctx->error = strdup("Unexpected error");
+	}
+}
+
+int
+xm_context_parse(xm_context_t *ctx, const char *pat)
+{
+	xm_context_prepare(ctx);
+	xm_context_init_scanner(ctx, pat);
+	xm_yyparse(ctx, ctx->scanner);
+	return !(ctx->error);
+}
+

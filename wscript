@@ -17,19 +17,21 @@ def init():
   pass
 
 def build(bld):
-  lib = bld.new_task_gen(
+  lib = bld(
       features = 'cshlib cc',
       includes = 'src/',
       target = APPNAME,
       uselib = "xmmsclient")
-  lib.find_sources_in_dirs('src/', ['test.c'], ['.l', '.y', '.c'])
+  lib.find_sources_in_dirs('src/', ['test'], ['.l', '.y', '.c'])
 
-  #app = bld.new_task_gen(
-  #    features = 'cprogram cc',
-  #    includes = 'src/',
-  #    target = 'coll-test',
-  #    source = 'coll-test.c',
-  #    uselib_local = APPNAME)
+  if bld.env['BUILD_TEST']:
+    app = bld(
+        features = 'cprogram cc',
+        includes = 'src/',
+        target = 'coll-test',
+        source = 'src/test/test.c',
+        uselib = "glib",
+        uselib_local = APPNAME)
 
 def configure(conf):
   conf.check_tool('misc gnu_dirs gcc')
@@ -40,6 +42,13 @@ def configure(conf):
       uselib_store="xmmsclient",
       args='--cflags --libs',
       mantadoty=True)
+  if conf.check_cfg(
+      package='glib-2.0',
+      uselib_store="glib",
+      args='--cflags --libs'):
+    conf.env['BUILD_TEST'] = True
+  else:
+    conf.env['BUILD_TEST'] = False
 
 def set_options(opt):
   opt.tool_options('gnu_dirs')

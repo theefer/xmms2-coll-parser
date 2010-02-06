@@ -1,5 +1,5 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2009 Raphaël Bois
+ *  Copyright (C) 2010 Raphaël Bois
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -15,78 +15,86 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "xmmsclient/xmmsclient.h"
-/* #include "xmmsclientpriv/xmmsclient.h" */
-#include "xmmsc/xmmsc_idnumbers.h"
+#include "error.h"
+#include "utils.h"
 
-#define XMMS_COLLECTION_PARSER_DEFAULT_NAMESPACE "Collections"
+#include <xmmsc/xmmsv.h>
 
-#ifndef NULL
-# define NULL ((void)0)
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef struct _xm_context xm_context_t;
-typedef struct _xm_sequence xm_sequence_t;
-typedef struct _xm_string xm_string_t;
 
 typedef enum {
-  XM_PARSER_CHECK_ONLY,
-  XM_PARSER_COMPILE
+	XM_PARSER_CHECK_ONLY,
+	XM_PARSER_COMPILE
 } xm_parser_mode_t;
-
-typedef enum {
-  XM_STRING_TYPE_STRING,
-  XM_STRING_TYPE_PATTERN,
-  XM_STRING_TYPE_INTEGER
-} xm_string_type_t;
-
 
 struct _xm_context
 {
-  void *scanner;
-  xmmsv_coll_t *result;
-  xm_parser_mode_t mode;
-  xm_string_t *scan_str;
-};
+	void *scanner;
+	void *scanbuf;
+	xmmsv_coll_t *result;
+	char *error;
+	xm_parser_mode_t mode;
+	xm_string_t *scan_str;
 
-struct _xm_sequence
-{
-  int start_range;
-  int end_range;
-  xm_sequence_t *prev;
-  xm_sequence_t *next;
+	xm_disposable_t garbage_root;
 };
-
-struct _xm_string
-{
-  xm_string_type_t type;
-  char *value;
-};
-
 
 xm_context_t *
-xm_context_new();
+xm_context_new(xm_parser_mode_t mode);
 
 void
-xm_context_store_result(xm_context_t *context, xmmsv_coll_t *result);
+xm_context_prepare(xm_context_t *ctx);
 
 void
-xm_context_string_init(xm_context_t *context);
+xm_context_free(xm_context_t *ctx);
 
-char *
-xm_context_string_dup(xm_context_t *ctx);
-
+/* in parser.y */
 int
-xm_context_string_to_int(xm_context_t *ctx);
+xm_context_parse(xm_context_t *ctx, const char *pat);
+/* */
+
+/* in scanner.l */
+void
+xm_context_init_scanner(xm_context_t *ctx, const char *input);
 
 void
-xm_context_string_append_patchar(xm_context_t *ctx, const char *pat);
+xm_context_destroy_scanner(xm_context_t *ctx);
+/* */
 
 void
-xm_context_string_append_digits(xm_context_t *ctx, const char *digits);
+xm_context_store_result(xm_context_t *ctx, xmmsv_coll_t *result);
+
+xmmsv_coll_t *
+xm_context_get_result(xm_context_t *ctx);
 
 void
-xm_context_string_append_str(xm_context_t *ctx, const char *str);
+xm_context_string_buffer_init(xm_context_t *ctx);
+
+xm_string_t *
+xm_context_string_buffer_ref(xm_context_t *ctx);
+
+void
+xm_context_string_buffer_append_patchar(xm_context_t *ctx, const char *pat);
+
+void
+xm_context_string_buffer_append_digits(xm_context_t *ctx, const char *digits);
+
+void
+xm_context_string_buffer_append_str(xm_context_t *ctx, const char *str);
+
+xm_string_t *
+xm_context_string_new(xm_context_t *ctx, xm_string_type_t t, const char *value);
+
+xm_sequence_t *
+xm_context_sequence_new_range(xm_context_t *ctx, int start, int end);
+
+xm_boxed_t *
+xm_context_boxed_new(xm_context_t *ctx, void *data, xm_destroy_func destroy_f);
+
 
 
 xmmsv_coll_t *
@@ -106,42 +114,23 @@ xmmsv_coll_t *
 xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq);
 
 xmmsv_coll_t *
-xm_build_unary(xm_context_t *ctx, int unary_op, const char *property);
+xm_build_unary(xm_context_t *ctx, xmmsv_coll_type_t unary_op,
+               const char *property);
 
 xmmsv_coll_t *
-xm_build_binary_with_string(xm_context_t *ctx, int binary_op,
-                            const char *property, xm_string_t *string);
+xm_build_binary_e(xm_context_t *ctx, xmmsv_coll_type_t lge_op,
+									const char *property, xm_string_t *xstr);
 
 xmmsv_coll_t *
-xm_build_binary_with_integer(xm_context_t *ctx, int binary_op,
-                             const char *property, int integer);
-
-char *
-xm_property_get_from_short(xm_context_t *ctx, const char *p);
+xm_build_binary(xm_context_t *ctx, xmmsv_coll_type_t binary_op,
+                const char *property, xm_string_t *xstr);
 
 xm_string_t *
-xm_string_new(xm_context_t *ctx, xm_string_type_t type, char *value);
+xm_property_get_from_short(xm_context_t *ctx, xm_string_t *p);
 
-void
-xm_string_free(xm_context_t *ctx, xm_string_t *xstr);
 
-xm_string_t *
-xm_string_new_from_integer(xm_context_t *ctx, int ivalue);
-
-void
-xm_string_append(xm_string_t *xstr, const char *str);
-
-xm_sequence_t *
-xm_range_new(xm_context_t *ctx, int start_range, int end_range);
-
-xm_sequence_t *
-xm_sequence_prepend_range(xm_context_t *ctx, xm_sequence_t *seq,
-                          xm_sequence_t *range);
-
-xm_sequence_t *
-xm_sequence_reverse(xm_context_t *ctx, xm_sequence_t *seq);
-
-void
-xm_sequence_free(xm_context_t *ctx, xm_sequence_t *seq);
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* COMMON_H */

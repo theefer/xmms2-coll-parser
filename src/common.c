@@ -1,9 +1,9 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2009 Raphaël Bois
+ *  Copyright (C) 2010 Raphaël Bois
  *
- *  Mostly copied from the collparser.c module of the XMMS2's xmmsclient
+ *  Some parts of the code are based on code from the XMMS2's xmmsclient
  *  library:
- *  Copyright (C) 2003-2009 XMMS2 Team
+ *  Copyright (C) 2003-2010 XMMS2 Team
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -16,254 +16,391 @@
  *  Lesser General Public License for more details.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdio.h> /* snprintf */
+#include <string.h> /* strdup */
 
+#include "utils.h"
 #include "common.h"
+
+#define XM_COLL_PARSER_DEFAULT_NAMESPACE "Collections"
 
 typedef struct {
 	char shortstr;
 	const char *longstr;
 } xm_coll_prop_t;
 
-static const xm_coll_prop_t
-xm_coll_prop_short[] = { { 'a', "artist" },
-                         { 'l', "album"},
-                         { 't', "title"},
-                         { 'n', "tracknr"},
-                         { 'y', "year"},
-                         { 'g', "genre"},
-                         { 'u', "url"},
-												 { '\0', NULL } };
+static const xm_coll_prop_t xm_coll_prop_short[] = {
+	{ 'a', "artist" },
+	{ 'l', "album"},
+	{ 't', "title"},
+	{ 'n', "tracknr"},
+	{ 'y', "year"},
+	{ 'g', "genre"},
+	{ 'u', "url"},
+	{ '\0', NULL }
+};
 
-static inline char *
-xm_strdup_safe(const char *p) {
-  char *dup = NULL;
-  if (p) {
-    dup = strdup(p);
-  }
-  return dup;
+/* Static functions */
+
+static void
+xm_context_destroy_garbage(xm_context_t *ctx)
+{
+	/* Thoses data are only accessed from within the parser.
+	 * So it is safe to destroy remaining data outside it. */
+	while (ctx->garbage_root.next) {
+		xm_disposable_destroy(ctx->garbage_root.next);
+	}
+	ctx->scan_str = NULL; /* Was in the garbage list. */
+}
+
+static void
+xm_context_push_garbage(xm_context_t *ctx, xm_disposable_t *d)
+{
+	xm_disposable_list_insert(d, &(ctx->garbage_root), ctx->garbage_root.next);
 }
 
 xm_context_t *
 xm_context_new(xm_parser_mode_t mode)
 {
-  xm_context_t *ctx;
+	xm_context_t *ctx;
 
-  ctx = (xm_context_t *) malloc(sizeof (xm_context_t));
-  ctx->scanner = NULL;
-  ctx->result = NULL;
-  ctx->mode = mode;
-  ctx->scan_str = NULL;
+	ctx = xm_new0(xm_context_t, 1);
+	ctx->mode = mode;
 
-  return ctx;
+	return ctx;
 }
 
 void
-xm_context_store_result(xm_context_t *context, xmmsv_coll_t *result)
+xm_context_prepare(xm_context_t *ctx)
 {
-  context->result = result;
+	xm_context_destroy_garbage(ctx);
+	if (ctx->result) {
+		xmmsv_coll_unref(ctx->result);
+		ctx->result = NULL;
+	}
+	if (ctx->error) {
+		free(ctx->error);
+		ctx->error = NULL;
+	}
 }
 
 void
-xm_context_string_init(xm_context_t *context)
+xm_context_free(xm_context_t *ctx)
 {
-  xm_string_free(NULL, context->scan_str);
-  context->scan_str = xm_string_new(NULL, XM_STRING_TYPE_INTEGER, "");
+	xm_context_prepare(ctx);
+	xm_context_destroy_scanner(ctx);
+	free(ctx);
 }
 
-char *
-xm_context_string_dup(xm_context_t *ctx)
+/* xm_context_parse() implemented in parser.y */
+
+/* xm_context_init_scanner() implemented in scanner.l */
+/* xm_context_destroy_scanner() implemented in scanner.l */
+
+void
+xm_context_store_result(xm_context_t *ctx, xmmsv_coll_t *result)
 {
-  if (!ctx || !ctx->scan_str) {
-    return NULL;
-  }
-  return xm_strdup_safe(ctx->scan_str->value);
+	if (ctx->result) {
+		xmmsv_coll_unref(ctx->result);
+	}
+	ctx->result = xmmsv_coll_ref(result);
+}
+
+xmmsv_coll_t *
+xm_context_get_result(xm_context_t *ctx)
+{
+	return xmmsv_coll_ref(ctx->result);
 }
 
 void
-xm_context_string_append_patchar(xm_context_t *ctx, const char *pat)
+xm_context_string_buffer_init(xm_context_t *ctx)
 {
-  xm_string_append(ctx->scan_str, pat);
-  ctx->scan_str->type = XM_STRING_TYPE_PATTERN;
+	xm_string_unref(ctx->scan_str);
+	ctx->scan_str = xm_string_new(XM_STRING_TYPE_INTEGER, "");
+	xm_context_push_garbage(ctx, &ctx->scan_str->base);
+}
+
+xm_string_t *
+xm_context_string_buffer_ref(xm_context_t *ctx)
+{
+	if (ctx->scan_str) {
+		xm_string_ref(ctx->scan_str);
+	}
+	return ctx->scan_str;
 }
 
 void
-xm_context_string_append_digits(xm_context_t *ctx, const char *digits)
+xm_context_string_buffer_append_patchar(xm_context_t *ctx, const char *pat)
 {
-  xm_string_append(ctx->scan_str, digits);
+	xm_string_append(ctx->scan_str, pat);
+	ctx->scan_str->type = XM_STRING_TYPE_PATTERN;
 }
 
 void
-xm_context_string_append_str(xm_context_t *ctx, const char *str)
+xm_context_string_buffer_append_digits(xm_context_t *ctx, const char *digits)
 {
-  xm_string_append(ctx->scan_str, str);
-  if (ctx->scan_str->type != XM_STRING_TYPE_PATTERN) {
-    ctx->scan_str->type = XM_STRING_TYPE_STRING;
-  }
+	xm_string_append(ctx->scan_str, digits);
+}
+
+void
+xm_context_string_buffer_append_str(xm_context_t *ctx, const char *str)
+{
+	xm_string_append(ctx->scan_str, str);
+	if (ctx->scan_str->type != XM_STRING_TYPE_PATTERN) {
+		ctx->scan_str->type = XM_STRING_TYPE_STRING;
+	}
+}
+
+xm_string_t *
+xm_context_string_new(xm_context_t *ctx, xm_string_type_t t, const char *value)
+{
+	xm_string_t *xstr;
+
+	xstr = xm_string_new(t, value);
+	xm_context_push_garbage(ctx, &xstr->base);
+
+	return xstr;
+}
+
+xm_sequence_t *
+xm_context_sequence_new_range(xm_context_t *ctx, int start, int end)
+{
+	xm_sequence_t *seq;
+
+	seq = xm_sequence_new();
+	xm_context_push_garbage(ctx, &seq->base);
+	xm_sequence_set_range(seq, start, end);
+
+	return seq;
+}
+
+xm_boxed_t *
+xm_context_boxed_new(xm_context_t *ctx, void *data, xm_destroy_func destroy_f)
+{
+	xm_boxed_t *boxed;
+	
+	boxed = xm_boxed_new(data, destroy_f);
+	xm_context_push_garbage(ctx, &boxed->base);
+
+	return boxed;
+}
+
+
+/* from xmmsclient's collparser.c*/
+static void
+coll_append_universe (xmmsv_coll_t *coll)
+{
+	xmmsv_coll_t *univ;
+
+	univ = xmmsv_coll_universe ();
+	xmmsv_coll_add_operand (coll, univ);
+	xmmsv_coll_unref (univ);
+}
+
+
+static xmmsv_coll_t *
+xm_build_and_or(xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
+                xmmsv_coll_type_t type)
+{
+	xmmsv_coll_t *coll;
+
+	if (xmmsv_coll_get_type(act_op) == type) {
+		coll = act_op;
+	} else {
+		coll = xmmsv_coll_new(type);
+		xmmsv_coll_add_operand(coll, act_op);
+		xmmsv_coll_unref(act_op);
+	}
+	xmmsv_coll_add_operand(coll, op);
+	xmmsv_coll_unref(op);
+
+	return coll;
 }
 
 xmmsv_coll_t *
 xm_build_union(xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op)
 {
-
-  /* TODO: implement xm_build_union() */
-  return NULL;
+	return xm_build_and_or(ctx, or_op, and_op, XMMS_COLLECTION_TYPE_UNION);
 }
 
 xmmsv_coll_t *
 xm_build_intersection(xm_context_t *ctx, xmmsv_coll_t *and_op,
                       xmmsv_coll_t *expr)
 {
-  /* TODO: implement xm_build_intersection() */
-  return NULL;
+	return xm_build_and_or(ctx, and_op, expr, XMMS_COLLECTION_TYPE_INTERSECTION);
 }
 
 xmmsv_coll_t *
 xm_build_complement(xm_context_t *ctx, xmmsv_coll_t *expr)
 {
-  /* TODO: implement xm_build_complement() */
-  return NULL;
+	xmmsv_coll_t *coll;
+
+	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_COMPLEMENT);
+	xmmsv_coll_add_operand(coll, expr);
+	xmmsv_coll_unref(expr);
+
+	return coll;
+}
+
+
+
+static char *
+xm_strsplit_namespace(const char *refname, const char **ref)
+{
+	size_t len;
+	char *namespace = NULL, *slash;
+
+	if (refname) {
+		slash = strchr(refname, '/');
+		if (!slash) {
+			namespace = strdup(XM_COLL_PARSER_DEFAULT_NAMESPACE);
+			if (ref) {
+				*ref = refname;
+			}
+		} else {
+			len = (size_t)(slash - refname);
+			namespace = xm_new(char, len + 1);
+			strncpy(namespace, refname, len);
+			namespace[len] = '\0';
+			if (ref) {
+				*ref = slash + 1;
+			}
+		}
+	}
+	return namespace;
 }
 
 xmmsv_coll_t *
 xm_build_reference(xm_context_t *ctx, const char *refname)
 {
-  /* TODO: implement xm_build_reference() */
-  return NULL;
+	char *namespace;
+	const char *ref;
+	xmmsv_coll_t *coll;
+
+	namespace = xm_strsplit_namespace(refname, &ref);
+
+	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_REFERENCE);
+	xmmsv_coll_attribute_set(coll, "namespace", namespace);
+	xmmsv_coll_attribute_set(coll, "reference", ref);
+
+	free(namespace);
+
+	return coll;
+}
+
+static int
+xm_idlist_sort(const void *i1, const void *i2)
+{
+	return *((int *)i1) - *((int *)i2);
 }
 
 xmmsv_coll_t *
 xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 {
-  /* TODO: implement xm_build_idlist() */
-  return NULL;
+	xmmsv_coll_t *coll;
+	int len, i, j, last;
+	int *idlist;
+	xm_sequence_t *iter;
+
+	for (len = 0, iter = seq; iter; iter = iter->next) {
+		if (iter->start <= iter->end) {
+			len += seq->end - seq->start + 1;
+		}
+	}
+	idlist = xm_new(int, len + 1);
+	for (i = 0, iter = seq; iter; iter = iter->next) {
+		for (j = iter->start; j <= iter->end; j++) {
+			idlist[i] = j;
+			i++;
+		}
+	}
+	idlist[i] = 0;
+	qsort(idlist, len, sizeof (int), xm_idlist_sort);
+
+	/* Now removes dupplicated entries. */
+	for (last=0,j=0,i=0; i < len; i++) {
+		if (idlist[i] != last) {
+			last = idlist[i];
+			if (i != j) {
+				idlist[j] = idlist[i];
+			}
+			j++;
+		}
+	}
+	idlist[j] = 0;
+	idlist = xm_renew(idlist, int, j+1);
+
+	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_IDLIST);
+	xmmsv_coll_set_idlist(coll, idlist);
+	free(idlist);
+
+	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_unary(xm_context_t *ctx, int unary_op, const char *property)
+xm_build_unary(xm_context_t *ctx, xmmsv_coll_type_t unary_op,
+               const char *property)
 {
- /* TODO: implement xm_build_unary() */ 
-  return NULL;
+	xmmsv_coll_t *coll;
+
+	coll = xmmsv_coll_new(unary_op);
+	xmmsv_coll_attribute_set(coll, "field", property);
+	coll_append_universe(coll);
+
+	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_binary_with_string(xm_context_t *ctx, int binary_op,
-                            const char *property, xm_string_t *string)
+xm_build_binary_e(xm_context_t *ctx, xmmsv_coll_type_t lge_op,
+									const char *property, xm_string_t *xstr)
 {
-  /* TODO: implement xm_build_binary_with_string() */
-  return NULL;
+	xm_string_t *cpy;
+	xmmsv_coll_t *coll;
+
+	cpy = xm_context_string_new(ctx, xstr->type, xstr->value);
+	/* FIXME: inc/dec the integer value */
+
+	coll = xm_build_binary(ctx, lge_op, property, cpy);
+	xm_string_unref(cpy);
+	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_binary_with_integer(xm_context_t *ctx, int binary_op,
-                             const char *property, int integer)
+xm_build_binary(xm_context_t *ctx, xmmsv_coll_type_t binary_op,
+                const char *property, xm_string_t *xstr)
 {
-  /* TODO: implement xm_build_binary_with_integer() */
-  return NULL;
-}
+	xmmsv_coll_t *coll, *m1, *m2, *m3;
 
-char *
-xm_property_get_from_short(xm_context_t *ctx, const char *p)
-{
-  const xm_coll_prop_t *cp;
-  const char *prop_name = p;
-
-  for (cp = xm_coll_prop_short; cp->shortstr; cp++) {
-    if (p[0] == cp->shortstr) {
-      prop_name = cp->longstr;
-      break;
-    }
-  }
-  return xm_strdup_safe(prop_name);
+	if (property) {
+		coll = xmmsv_coll_new(binary_op);
+		xmmsv_coll_attribute_set(coll, "field", property);
+		xmmsv_coll_attribute_set(coll, "value", xstr->value);
+		coll_append_universe(coll);
+	} else {
+		m1 = xm_build_binary(ctx, binary_op, "artist", xstr);
+		m2 = xm_build_binary(ctx, binary_op, "album", xstr);
+		m3 = xm_build_binary(ctx, binary_op, "title", xstr);
+		coll = xm_build_union(ctx, m1, m2);
+		coll = xm_build_union(ctx, coll, m3);
+		/* m1, m2, m3 already dereferenced ! */
+	}
+	return coll;
 }
 
 xm_string_t *
-xm_string_new(xm_context_t *ctx, xm_string_type_t type, char *value)
+xm_property_get_from_short(xm_context_t *ctx, xm_string_t *p)
 {
-  xm_string_t *xstr;
+	const xm_coll_prop_t *iter;
+	const char *prop_name = p->value;
 
-  xstr = (xm_string_t *) malloc(sizeof (xm_string_t));
-  xstr->type = type;
-  xstr->value = value;
-  return xstr;
+	for (iter = xm_coll_prop_short; iter->shortstr; iter++) {
+		if (p->value[0] == iter->shortstr) {
+			prop_name = iter->longstr;
+			break;
+		}
+	}
+
+	return xm_context_string_new(ctx, XM_STRING_TYPE_STRING, prop_name);
 }
 
-void
-xm_string_free(xm_context_t *ctx, xm_string_t *xstr)
-{
-  if (!xstr) return;
-  free(xstr->value);
-  free(xstr);
-}
-
-xm_string_t *
-xm_string_new_from_integer(xm_context_t *ctx, int ivalue)
-{
-  char sval[24];
-  snprintf(sval, sizeof(sval), "%d", ivalue);
-  return xm_string_new(ctx, XM_STRING_TYPE_INTEGER, xm_strdup_safe(sval));
-}
-
-void
-xm_string_append(xm_string_t *xstr, const char *str)
-{
-  if (!xstr) return;
-  if (!xstr->value) {
-    xstr->value = xm_strdup_safe(str);
-  } else {
-    int n = strlen(str);
-    xstr->value = realloc(xstr->value, strlen(xstr->value) + n + 1);
-    strncat(xstr->value, str, n);
-  }
-}
-
-xm_sequence_t *
-xm_range_new(xm_context_t *ctx, int start_range, int end_range)
-{
-  xm_sequence_t *newit;
-
-  newit = (xm_sequence_t *) malloc(sizeof (xm_sequence_t));
-  newit->start_range = start_range;
-  newit->end_range = end_range;
-  newit->prev = NULL;
-  newit->next = NULL;
-  return newit;
-}
-
-xm_sequence_t *
-xm_sequence_prepend_range(xm_context_t *ctx, xm_sequence_t *seq,
-                          xm_sequence_t *range)
-{
-  if (range) {
-    range->next = seq;
-    seq = range;
-  }
-  return seq;
-}
-
-xm_sequence_t *
-xm_sequence_reverse(xm_context_t *ctx, xm_sequence_t *seq)
-{
-  xm_sequence_t *iter, *next = seq;
-  while (next) {
-    iter = next;
-    next = iter->next;
-    iter->next = iter->prev;
-    iter->prev = next;
-  }
-  return iter;
-}
-
-void
-xm_sequence_free(xm_context_t *ctx, xm_sequence_t *seq)
-{
-  xm_sequence_t *iter, *next = seq;
-  while(next) {
-    iter = next;
-    next = iter->next;
-    free(iter);
-  }
-}

@@ -1,0 +1,32 @@
+foo
+"foo"
+'foo'
+"foo'bar"
+'foo"bar'
+"foo'"'"bar'
+foo:bar
+foo:bar*
+foo:bar?
+foo~bar
+foo~bar*
+foo~bar?
+:foo
+~bar
+fo:foo OR br:bar
+fo:foo OR br:bar OR bz:baz
+fo:foo AND br:bar
+fo:foo AND br:bar AND bz:baz
+fo:foo OR br:bar AND bz:baz
+fo:foo AND br:bar OR bz:baz
+foo<10
+foo<=10
+foo>10
+foo>=10
++foo
+in:Foo
+in:Playlists/Foo
+#10
+#10,11
+#10-20
+#10,11-15,16
+#10,30,20,28-32
