@@ -88,7 +88,7 @@ xm_disposable_unref(xm_disposable_t *d)
 {
 	if (d) {
 		d->ref--;
-		if (d->ref <= 0) {
+		if (!d->ref) {
 			xm_disposable_destroy(d);
 		}
 	}
@@ -185,7 +185,7 @@ void
 xm_sequence_set_range(xm_sequence_t *seq, unsigned int start, unsigned int end)
 {
 	if (seq) {
-		if (start <= 0) {
+		if (start == 0) {
 			start = 1;
 		}
 		seq->start = start;

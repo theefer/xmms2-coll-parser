@@ -305,7 +305,7 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 
 	for (len = 0, iter = seq; iter; iter = iter->next) {
 		if (iter->start <= iter->end) {
-			len += seq->end - seq->start + 1;
+			len += iter->end - iter->start + 1;
 		}
 	}
 	idlist = xm_new(unsigned int, len + 1);
