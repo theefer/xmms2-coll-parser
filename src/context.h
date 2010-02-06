@@ -12,8 +12,8 @@
  *  Lesser General Public License for more details.
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef XM_CONTEXT_H
+#define XM_CONTEXT_H
 
 #include "error.h"
 #include "utils.h"
@@ -96,41 +96,8 @@ xm_boxed_t *
 xm_context_boxed_new(xm_context_t *ctx, void *data, xm_destroy_func destroy_f);
 
 
-
-xmmsv_coll_t *
-xm_build_union(xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op);
-
-xmmsv_coll_t *
-xm_build_intersection(xm_context_t *ctx, xmmsv_coll_t *and_op,
-                      xmmsv_coll_t *expr);
-
-xmmsv_coll_t *
-xm_build_complement(xm_context_t *ctx, xmmsv_coll_t *expr);
-
-xmmsv_coll_t *
-xm_build_reference(xm_context_t *ctx, const char *refname);
-
-xmmsv_coll_t *
-xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq);
-
-xmmsv_coll_t *
-xm_build_unary(xm_context_t *ctx, xmmsv_coll_type_t unary_op,
-               const char *property);
-
-xmmsv_coll_t *
-xm_build_binary_e(xm_context_t *ctx, xmmsv_coll_type_t lge_op,
-									const char *property, xm_string_t *xstr);
-
-xmmsv_coll_t *
-xm_build_binary(xm_context_t *ctx, xmmsv_coll_type_t binary_op,
-                const char *property, xm_string_t *xstr);
-
-xm_string_t *
-xm_property_get_from_short(xm_context_t *ctx, xm_string_t *p);
-
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* COMMON_H */
+#endif /* XM_CONTEXT_H */

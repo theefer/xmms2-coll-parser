@@ -150,11 +150,44 @@ xm_string_append(xm_string_t *xstr, const char *str)
 			xstr->value = xm_strdup_safe(str);
 			xstr->len = n;
 		} else {
-			xstr->value = realloc(xstr->value, xstr->len + n + 1);
+			xstr->value = xm_renew(xstr->value, char, xstr->len + n + 1);
 			strncat(xstr->value, str, n);
 			xstr->len += n;
 		}
 	}
+}
+
+void
+xm_string_prepend(xm_string_t *xstr, const char *str)
+{
+	int n;
+	char *value;
+
+	if (xstr && str) {
+		value = xstr->value;
+		n = strlen(str);
+		xstr->value = xm_new(char, xstr->len + n + 1);
+		strncpy(xstr->value, str, n);
+		if (xstr->len) {
+			strncpy(&(xstr->value[n]), value, xstr->len);
+		}
+		xstr->len += n;
+		xstr->value[xstr->len] = '\0';
+		free(value);
+	}
+}
+
+void
+xm_string_numeric_add(xm_string_t *xstr, int val)
+{
+	char buf[64] = "";
+
+	if (xstr && xstr->type == XM_STRING_TYPE_INTEGER) {
+		snprintf(buf, 64, "%d", atoi(xstr->value) + val);
+		free(xstr->value);
+		xstr->value = xm_strdup_safe(buf);
+		xstr->len = strlen(xstr->value);
+  }
 }
 
 xm_string_type_t

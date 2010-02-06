@@ -16,7 +16,7 @@
 #include <stdio.h> /* snprintf */
 #include <string.h> /* strdup */
 
-#include "context.h"
+#include "coll-builder.h"
 %}
 
 %define api.pure

@@ -97,6 +97,12 @@ xm_string_unref(xm_string_t *xstr);
 void
 xm_string_append(xm_string_t *xstr, const char *str);
 
+void
+xm_string_prepend(xm_string_t *xstr, const char *str);
+
+void
+xm_string_numeric_add(xm_string_t *xstr, int val);
+
 xm_string_type_t
 xm_string_get_type(xm_string_t *xstr);
 
