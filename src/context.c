@@ -16,12 +16,9 @@
  *  Lesser General Public License for more details.
  */
 
-#include <stdlib.h>
-#include <stdio.h> /* snprintf */
-#include <string.h> /* strdup */
+#include <string.h>
 
-#include "utils.h"
-#include "common.h"
+#include "context.h"
 
 #define XM_COLL_PARSER_DEFAULT_NAMESPACE "Collections"
 
@@ -254,7 +251,7 @@ xm_strsplit_namespace(const char *refname, const char **ref)
 	if (refname) {
 		slash = strchr(refname, '/');
 		if (!slash) {
-			namespace = strdup(XM_COLL_PARSER_DEFAULT_NAMESPACE);
+			namespace = xm_strdup_safe(XM_COLL_PARSER_DEFAULT_NAMESPACE);
 			if (ref) {
 				*ref = refname;
 			}

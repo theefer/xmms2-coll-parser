@@ -16,7 +16,7 @@
 #include <stdio.h> /* snprintf */
 #include <string.h> /* strdup */
 
-#include "common.h"
+#include "context.h"
 %}
 
 %define api.pure

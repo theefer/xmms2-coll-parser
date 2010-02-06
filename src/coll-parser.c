@@ -14,7 +14,7 @@
  */
 
 #include "coll-parser.h"
-#include "common.h"
+#include "context.h"
 
 static xmmsv_t *
 xm_coll_parse(const char *pattern, xm_parser_mode_t mode)
