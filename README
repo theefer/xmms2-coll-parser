@@ -1,0 +1,71 @@
+================================================================================
+  XmCollParser - A parser for the XMMS2 collection query language.
+================================================================================
+
+This parser is a complete rewrite of the collection parser from the xmmsclient
+library, written with Bison and Flex. At the exception of the test program, the
+compiled library depends on the xmmsclient library only.
+
+
+
+Compilation and installation
+============================
+
+Requirements
+------------
+
+  - The xmmsclient library
+  - Bison and Flex
+  - python 2.5+ (for the WAF build system)
+
+Compilation
+-----------
+
+  $ ./waf configure
+  $ ./waf build
+
+Installation
+------------
+
+  $ ./waf install
+
+
+
+Differences with the original collection parser
+===============================================
+
+  - Supports shell-like in-string quotes:
+      foo:He'll'o" World"!
+    is equivalent to
+      foo:"Hello World!"
+
+  - A sequence of ids generate an idlist without repeated ids:
+      #1,5,3-6
+    is converted to  IdList: (1, 3, 4, 5, 6)
+
+  - Quoted '*' and '?' are considered literal characters when used with the ':'
+    filter operator:
+      e.g.   foo:"Hello*World"
+    However, they can't be mixed with non-quoted */? (see Issues section below).
+
+
+Issues
+======
+
+At this stage, collection structures produced by the parser have not been tested
+for real queries. Suspected issues are the following:
+
+  - A combination of quoted and non-quoted * and ?, makes all * and ?
+    glob characters.
+      e.g.   foo:'foo*bar'?   is equivalent to   foo~foo*bar?
+    The behavior of quoted */? might change in the future to match the behavior
+    of the original parser, except if support for literal */? in MATCH patterns
+    is added in XMMS2.
+
+  - in:* does not match Universe
+
+
+Wishlist
+========
+
+See the file TODO.

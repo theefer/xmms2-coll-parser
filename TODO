@@ -1,0 +1,62 @@
+Wished extensions and improvements:
+
+- Set a default Reference collection. Some ideas:
+
+    @Foo artist:Bar AND album:Baz
+    =>
+      Intersection:
+        Equals ('artist', 'foo') for:
+          Reference: 'Collections/Foo'
+        Equals ('album', 'bar') for:
+          Reference: 'Collections/Foo'
+
+    artist:Bar@Foo AND album:Baz
+    =>
+      Intersection:
+        Equals ('artist', 'foo') for:
+          Reference: 'Collections/Foo'
+        Equals ('album', 'bar') for:
+          Reference: 'All Media'
+
+    artist:Bar OR ( @Foo album:Baz AND title~"foo" ) OR title:foo*bar
+    =>
+      Union:
+        Equals ('artist', 'Bar') for:
+          Reference: 'All Media'
+        Intersection:
+          Equals ('album', 'Baz') for:
+            Reference: 'Collections/Foo'
+          Match ('title', '*foo*') for:
+            Reference: 'Collections/Foo'
+        Match ('title', 'foo*bar') for:
+          Reference: 'All Media'
+
+
+- Merge IDS sequences in one IdList:
+
+    #1,3-5 #10 #8-12
+    =>
+      IdList: (1, 3, 4, 5, 8, 9, 10, 11, 12)
+
+
+- "Advanced" merge:
+
+    #1,2 OR title:foo OR #3,4
+    =>
+      Union:
+        IdList: (1, 2, 3, 4)
+        Equals ('title', 'foo') for:
+          Reference: 'All Media'
+
+    artist:foo OR ( @Foo artist:Baz OR title~foobar ) OR title:bar
+    =>
+      Union:
+        Equals ('artist', 'foo') for:
+          Reference: 'All Media'
+        Equals ('artist', 'Baz') for:
+          Reference: 'Collections/Foo'
+        Match ('title', '*foobar*') for:
+          Reference: 'Collections/Foo'
+        Equals ('title', 'bar') for:
+          Reference: 'All Media'
+
