@@ -276,9 +276,9 @@ xm_build_binary (xm_context_t *ctx, xmmsv_coll_type_t binary_op,
 		m3 = xm_build_binary (ctx, binary_op, "title", xstr);
 		coll = xm_build_union (ctx, m1, m2);
 		coll = xm_build_union (ctx, coll, m3);
-    xmmsv_coll_unref(m1);
-    xmmsv_coll_unref(m2);
-    xmmsv_coll_unref(m3);
+		xmmsv_coll_unref(m1);
+		xmmsv_coll_unref(m2);
+		xmmsv_coll_unref(m3);
 	}
 	return coll;
 }
