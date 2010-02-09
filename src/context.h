@@ -1,5 +1,5 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2010 Raphaël Bois
+ *  Copyright (C) 2009-2010 Raphaël Bois
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -44,56 +44,56 @@ struct _xm_context
 };
 
 xm_context_t *
-xm_context_new(xm_parser_mode_t mode);
+xm_context_new (xm_parser_mode_t mode);
 
 void
-xm_context_prepare(xm_context_t *ctx);
+xm_context_prepare (xm_context_t *ctx);
 
 void
-xm_context_free(xm_context_t *ctx);
+xm_context_free (xm_context_t *ctx);
 
 /* in parser.y */
 int
-xm_context_parse(xm_context_t *ctx, const char *pat);
+xm_context_parse (xm_context_t *ctx, const char *pat);
 /* */
 
 /* in scanner.l */
 void
-xm_context_init_scanner(xm_context_t *ctx, const char *input);
+xm_context_init_scanner (xm_context_t *ctx, const char *input);
 
 void
-xm_context_destroy_scanner(xm_context_t *ctx);
+xm_context_destroy_scanner (xm_context_t *ctx);
 /* */
 
 void
-xm_context_store_result(xm_context_t *ctx, xmmsv_coll_t *result);
+xm_context_store_result (xm_context_t *ctx, xmmsv_coll_t *result);
 
 xmmsv_coll_t *
-xm_context_get_result(xm_context_t *ctx);
+xm_context_get_result (xm_context_t *ctx);
 
 void
-xm_context_string_buffer_init(xm_context_t *ctx);
+xm_context_string_buffer_init (xm_context_t *ctx);
 
 xm_string_t *
-xm_context_string_buffer_ref(xm_context_t *ctx);
+xm_context_string_buffer_ref (xm_context_t *ctx);
 
 void
-xm_context_string_buffer_append_patchar(xm_context_t *ctx, const char *pat);
+xm_context_string_buffer_append_patchar (xm_context_t *ctx, const char *pat);
 
 void
-xm_context_string_buffer_append_digits(xm_context_t *ctx, const char *digits);
+xm_context_string_buffer_append_digits (xm_context_t *ctx, const char *digits);
 
 void
-xm_context_string_buffer_append_str(xm_context_t *ctx, const char *str);
+xm_context_string_buffer_append_str (xm_context_t *ctx, const char *str);
 
 xm_string_t *
-xm_context_string_new(xm_context_t *ctx, xm_string_type_t t, const char *value);
+xm_context_string_new (xm_context_t *ctx, xm_string_type_t t, const char *value);
 
 xm_sequence_t *
-xm_context_sequence_new_range(xm_context_t *ctx, int start, int end);
+xm_context_sequence_new_range (xm_context_t *ctx, int start, int end);
 
 xm_boxed_t *
-xm_context_boxed_new(xm_context_t *ctx, void *data, xm_destroy_func destroy_f);
+xm_context_boxed_new (xm_context_t *ctx, void *data, xm_destroy_func destroy_f);
 
 
 #ifdef __cplusplus

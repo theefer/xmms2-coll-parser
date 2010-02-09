@@ -17,40 +17,40 @@
 #include "context.h"
 
 static xmmsv_t *
-xm_coll_parse(const char *pattern, xm_parser_mode_t mode)
+xm_coll_parse (const char *pattern, xm_parser_mode_t mode)
 {
 	xm_context_t *ctx;
 	xmmsv_t *result = NULL;
 
-	ctx = xm_context_new(mode);
+	ctx = xm_context_new (mode);
 
-	if (!xm_context_parse(ctx, pattern)) {
-		result = xmmsv_new_error(ctx->error);
+	if (!xm_context_parse (ctx, pattern)) {
+		result = xmmsv_new_error (ctx->error);
 	} else if (ctx->mode == XM_PARSER_COMPILE && ctx->result) {
-		result = xmmsv_new_coll(ctx->result);
+		result = xmmsv_new_coll (ctx->result);
 	}
-	xm_context_free(ctx);
+	xm_context_free (ctx);
 
 	return result;
 }
 
 xmmsv_t *
-xm_coll_compile_pattern(const char *pattern)
+xm_coll_compile_pattern (const char *pattern)
 {
-	return xm_coll_parse(pattern, XM_PARSER_COMPILE);
+	return xm_coll_parse (pattern, XM_PARSER_COMPILE);
 }
 
 int
-xm_coll_check_pattern(const char *pattern, xmmsv_t **error)
+xm_coll_check_pattern (const char *pattern, xmmsv_t **error)
 {
 	xmmsv_t *ret;
 	
-	ret = xm_coll_parse(pattern, XM_PARSER_CHECK_ONLY);
+	ret = xm_coll_parse (pattern, XM_PARSER_CHECK_ONLY);
 	if (ret) {
 		if (error) {
-			*error = xmmsv_ref(ret);
+			*error = xmmsv_ref (ret);
 		}
-		xmmsv_unref(ret);
+		xmmsv_unref (ret);
 	}
 	return !(ret);
 }

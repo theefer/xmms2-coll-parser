@@ -13,8 +13,8 @@
  *
  *  
  *  NOTE:
- *    Functions coll_* and print_info are copied from nycli, from the XMMS2
- *    project:
+ *    Functions coll_* and print_info are mostly copied from nycli, part of the
+ *    XMMS2 project:
  *    Copyright (C) 2003-2010 XMMS2 Team.
  */
 
@@ -25,39 +25,39 @@
 static void
 coll_dump (xmmsv_coll_t *coll, guint level);
 
-gint main() {
-  GIOChannel *in_channel = g_io_channel_unix_new(0); /* stdin */
-  GString *linebuf = g_string_new("");
-  const char *errval;
-  gsize termpos = 0;
-  GError *err = NULL;
-  xmmsv_t *value;
-  xmmsv_coll_t *coll = NULL;
+gint main () {
+	GIOChannel *in_channel = g_io_channel_unix_new (0); /* stdin */
+	GString *linebuf = g_string_new ("");
+	const char *errval;
+	gsize termpos = 0;
+	GError *err = NULL;
+	xmmsv_t *value;
+	xmmsv_coll_t *coll = NULL;
 
-  while (g_io_channel_read_line_string(in_channel, linebuf, &termpos, &err) == G_IO_STATUS_NORMAL) {
-    g_string_overwrite(linebuf, termpos, "");
-    g_printf("QUERY: %s", linebuf->str);
-    value = xm_coll_compile_pattern(linebuf->str);
-    if (xmmsv_is_error(value)) {
-      xmmsv_get_error(value, &errval);
-      g_printf("ERROR: %s\n", errval);
-    } else {
-      xmmsv_get_coll(value, &coll);
-      if (coll) {
-        coll_dump(coll, 0);
-      } else {
-        g_printf("ERROR: No collection.\n");
-      }
-    }
-    g_printf("\n");
-    xmmsv_unref(value);
-  };
-  if (err) {
-    g_critical("%s", err->message);
-    g_error_free(err);
-    return 1;
-  }
-  return 0;
+	while (g_io_channel_read_line_string (in_channel, linebuf, &termpos, &err) == G_IO_STATUS_NORMAL) {
+		g_string_overwrite (linebuf, termpos, "");
+		g_printf ("QUERY: %s", linebuf->str);
+		value = xm_coll_compile_pattern (linebuf->str);
+		if (xmmsv_is_error (value)) {
+			xmmsv_get_error (value, &errval);
+			g_printf ("ERROR: %s\n", errval);
+		} else {
+			xmmsv_get_coll (value, &coll);
+			if (coll) {
+				coll_dump (coll, 1);
+			} else {
+				g_printf ("ERROR: No collection.\n");
+			}
+		}
+		g_printf ("\n");
+		xmmsv_unref (value);
+	};
+	if (err) {
+		g_critical ("%s", err->message);
+		g_error_free (err);
+		return 1;
+	}
+	return 0;
 }
 
 
@@ -117,7 +117,8 @@ print_info (const gchar *fmt, ...)
 	g_printf ("%s\n", buf);
 }
 
-/* Function copied from nycli. */
+/* Function copied from nycli */
+/* Patch: display namespace in Reference. */
 static void
 coll_dump (xmmsv_coll_t *coll, guint level)
 {
@@ -126,6 +127,7 @@ coll_dump (xmmsv_coll_t *coll, guint level)
 
 	gchar *attr1;
 	gchar *attr2;
+	gchar *sep;
 	GString *idlist_str;
 
 	indent = g_malloc ((level * 2) + 1);
@@ -138,7 +140,14 @@ coll_dump (xmmsv_coll_t *coll, guint level)
 	switch (xmmsc_coll_get_type (coll)) {
 	case XMMS_COLLECTION_TYPE_REFERENCE:
 		xmmsc_coll_attribute_get (coll, "reference", &attr1);
-		print_info ("%sReference: '%s'", indent, attr1);
+		xmmsc_coll_attribute_get (coll, "namespace", &attr2);
+		if (attr2) {
+		  sep = "/";
+		} else {
+		  attr2 = "";
+		  sep = "";
+		}
+		print_info ("%sReference: '%s%s%s'", indent, attr2, sep, attr1);
 		break;
 
 	case XMMS_COLLECTION_TYPE_UNION:

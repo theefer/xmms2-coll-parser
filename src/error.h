@@ -1,5 +1,5 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2010 Raphaël Bois
+ *  Copyright (C) 2009-2010 Raphaël Bois
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -15,11 +15,9 @@
 #ifndef XM_ERROR_H
 #define XM_ERROR_H
 
-/* The purpose of this header is to facilitate internationalization. */
-
 #define XM_ERROR_UNEXPECTED "Unexpected error."
 #define XM_ERROR_DEFAULT_FORMAT "At line %d, character %d: %s"
 
-#define XM_ERROR_SEMANTIC_NOT_INTEGER "Semantic error: integer expected."
+#define XM_ERROR_SEMANTIC_NOT_INTEGER "Semantic error, integer expected."
 
 #endif /* XM_ERROR_H */

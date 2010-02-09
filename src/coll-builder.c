@@ -1,5 +1,5 @@
 /*  XMMS2 Collection parser
- *  Copyright (C) 2010 Raphaël Bois
+ *  Copyright (C) 2009-2010 Raphaël Bois
  *
  *  Some parts of the code are based on code from the XMMS2's xmmsclient
  *  library:
@@ -26,14 +26,14 @@ static void
 coll_append_universe (xmmsv_coll_t *coll);
 
 static xmmsv_coll_t *
-xm_build_and_or(xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
-                xmmsv_coll_type_t type);
+xm_build_and_or (xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
+                 xmmsv_coll_type_t type);
 
 static char *
-xm_extract_namespace(const char *refname, const char **ref);
+xm_extract_namespace (const char *refname, const char **ref);
 
 static int
-xm_idlist_sort(const void *i1, const void *i2);
+xm_idlist_sort (const void *i1, const void *i2);
 
 
 typedef struct {
@@ -65,41 +65,41 @@ coll_append_universe (xmmsv_coll_t *coll)
 }
 
 static xmmsv_coll_t *
-xm_build_and_or(xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
-                xmmsv_coll_type_t type)
+xm_build_and_or (xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
+                 xmmsv_coll_type_t type)
 {
 	xmmsv_coll_t *coll;
 
-	if (xmmsv_coll_get_type(act_op) == type) {
+	if (xmmsv_coll_get_type (act_op) == type) {
 		coll = act_op;
 	} else {
-		coll = xmmsv_coll_new(type);
-		xmmsv_coll_add_operand(coll, act_op);
-		xmmsv_coll_unref(act_op);
+		coll = xmmsv_coll_new (type);
+		xmmsv_coll_add_operand (coll, act_op);
+		xmmsv_coll_unref (act_op);
 	}
-	xmmsv_coll_add_operand(coll, op);
-	xmmsv_coll_unref(op);
+	xmmsv_coll_add_operand (coll, op);
+	xmmsv_coll_unref (op);
 
 	return coll;
 }
 
 static char *
-xm_extract_namespace(const char *refname, const char **ref)
+xm_extract_namespace (const char *refname, const char **ref)
 {
 	size_t len;
 	char *namespace = NULL, *slash;
 
 	if (refname) {
-		slash = strchr(refname, '/');
+		slash = strchr (refname, '/');
 		if (!slash) {
-			namespace = xm_strdup_safe(XM_COLL_PARSER_DEFAULT_NAMESPACE);
+			namespace = xm_strdup_safe (XM_COLL_PARSER_DEFAULT_NAMESPACE);
 			if (ref) {
 				*ref = refname;
 			}
 		} else {
 			len = (size_t)(slash - refname);
-			namespace = xm_new(char, len + 1);
-			strncpy(namespace, refname, len);
+			namespace = xm_new (char, len + 1);
+			strncpy (namespace, refname, len);
 			namespace[len] = '\0';
 			if (ref) {
 				*ref = slash + 1;
@@ -118,50 +118,50 @@ xm_idlist_sort(const void *i1, const void *i2)
 
 
 xmmsv_coll_t *
-xm_build_union(xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op)
+xm_build_union (xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op)
 {
-	return xm_build_and_or(ctx, or_op, and_op, XMMS_COLLECTION_TYPE_UNION);
+	return xm_build_and_or (ctx, or_op, and_op, XMMS_COLLECTION_TYPE_UNION);
 }
 
 xmmsv_coll_t *
-xm_build_intersection(xm_context_t *ctx, xmmsv_coll_t *and_op,
-                      xmmsv_coll_t *expr)
+xm_build_intersection (xm_context_t *ctx, xmmsv_coll_t *and_op,
+                       xmmsv_coll_t *expr)
 {
-	return xm_build_and_or(ctx, and_op, expr, XMMS_COLLECTION_TYPE_INTERSECTION);
+	return xm_build_and_or (ctx, and_op, expr, XMMS_COLLECTION_TYPE_INTERSECTION);
 }
 
 xmmsv_coll_t *
-xm_build_complement(xm_context_t *ctx, xmmsv_coll_t *expr)
+xm_build_complement (xm_context_t *ctx, xmmsv_coll_t *expr)
 {
 	xmmsv_coll_t *coll;
 
-	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_COMPLEMENT);
-	xmmsv_coll_add_operand(coll, expr);
-	xmmsv_coll_unref(expr);
+	coll = xmmsv_coll_new (XMMS_COLLECTION_TYPE_COMPLEMENT);
+	xmmsv_coll_add_operand (coll, expr);
+	xmmsv_coll_unref (expr);
 
 	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_reference(xm_context_t *ctx, const char *refname)
+xm_build_reference (xm_context_t *ctx, const char *refname)
 {
 	char *namespace;
 	const char *ref = NULL;
 	xmmsv_coll_t *coll;
 
-	namespace = xm_extract_namespace(refname, &ref);
+	namespace = xm_extract_namespace (refname, &ref);
 
-	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_REFERENCE);
-	xmmsv_coll_attribute_set(coll, "namespace", namespace);
-	xmmsv_coll_attribute_set(coll, "reference", ref);
+	coll = xmmsv_coll_new (XMMS_COLLECTION_TYPE_REFERENCE);
+	xmmsv_coll_attribute_set (coll, "namespace", namespace);
+	xmmsv_coll_attribute_set (coll, "reference", ref);
 
-	free(namespace);
+	free (namespace);
 
 	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
+xm_build_idlist (xm_context_t *ctx, xm_sequence_t *seq)
 {
 	xmmsv_coll_t *coll;
 	unsigned int len, i, j, last;
@@ -173,7 +173,7 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 			len += iter->end - iter->start + 1;
 		}
 	}
-	idlist = xm_new(unsigned int, len + 1);
+	idlist = xm_new (unsigned int, len + 1);
 	for (i = 0, iter = seq; iter; iter = iter->next) {
 		for (j = iter->start; j <= iter->end; j++) {
 			idlist[i] = j;
@@ -196,52 +196,52 @@ xm_build_idlist(xm_context_t *ctx, xm_sequence_t *seq)
 	idlist[j] = 0;
 	idlist = xm_renew(idlist, unsigned int, j+1);
 
-	coll = xmmsv_coll_new(XMMS_COLLECTION_TYPE_IDLIST);
-	xmmsv_coll_set_idlist(coll, idlist);
-	free(idlist);
+	coll = xmmsv_coll_new (XMMS_COLLECTION_TYPE_IDLIST);
+	xmmsv_coll_set_idlist (coll, idlist);
+	free (idlist);
 
 	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_unary(xm_context_t *ctx, xmmsv_coll_type_t unary_op,
-               const char *property)
+xm_build_unary (xm_context_t *ctx, xmmsv_coll_type_t unary_op,
+                const char *property)
 {
 	xmmsv_coll_t *coll;
 
-	coll = xmmsv_coll_new(unary_op);
-	xmmsv_coll_attribute_set(coll, "field", property);
-	coll_append_universe(coll);
+	coll = xmmsv_coll_new (unary_op);
+	xmmsv_coll_attribute_set (coll, "field", property);
+	coll_append_universe (coll);
 
 	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_binary_e(xm_context_t *ctx, xmmsv_coll_type_t lge_op,
-									const char *property, xm_string_t *xstr)
+xm_build_binary_e (xm_context_t *ctx, xmmsv_coll_type_t lge_op,
+                   const char *property, xm_string_t *xstr)
 {
 	xm_string_t *cpy;
 	xmmsv_coll_t *coll;
 
-	cpy = xm_string_new(xstr->type, xstr->value);
+	cpy = xm_string_new (xstr->type, xstr->value);
 	switch (lge_op) {
 		case XMMS_COLLECTION_TYPE_GREATER:
-			xm_string_numeric_add(cpy, -1);
+			xm_string_numeric_add (cpy, -1);
 			break;
 		case XMMS_COLLECTION_TYPE_SMALLER:
-			xm_string_numeric_add(cpy, 1);
+			xm_string_numeric_add (cpy, 1);
 			break;
 		default:
 			break;
 	}
-	coll = xm_build_binary(ctx, lge_op, property, cpy);
-	xm_string_unref(cpy);
+	coll = xm_build_binary (ctx, lge_op, property, cpy);
+	xm_string_unref (cpy);
 	return coll;
 }
 
 xmmsv_coll_t *
-xm_build_binary(xm_context_t *ctx, xmmsv_coll_type_t binary_op,
-                const char *property, xm_string_t *xstr)
+xm_build_binary (xm_context_t *ctx, xmmsv_coll_type_t binary_op,
+                 const char *property, xm_string_t *xstr)
 {
 	xmmsv_coll_t *coll, *m1, *m2, *m3;
 	xm_string_t *mstr = NULL;
@@ -249,43 +249,43 @@ xm_build_binary(xm_context_t *ctx, xmmsv_coll_type_t binary_op,
 	if (property) {
 		switch (binary_op) {
 			case XMMS_COLLECTION_TYPE_EQUALS:
-				if (strchr(xstr->value, '*') || strchr(xstr->value, '?')) {
+				if (strchr (xstr->value, '*') || strchr (xstr->value, '?')) {
 					binary_op = XMMS_COLLECTION_TYPE_MATCH;
 				}
-				mstr = xm_string_ref(xstr);
+				mstr = xm_string_ref (xstr);
 				break;
 			case XMMS_COLLECTION_TYPE_MATCH:
-				mstr = xm_string_new(XM_STRING_TYPE_PATTERN, xstr->value);
+				mstr = xm_string_new (XM_STRING_TYPE_PATTERN, xstr->value);
 				if (mstr->value[0] != '*') {
-					xm_string_prepend(mstr, "*");
+					xm_string_prepend (mstr, "*");
 				}
 				if (mstr->value[mstr->len-1] != '*') {
-					xm_string_append(mstr, "*");
+					xm_string_append (mstr, "*");
 				}
 				break;
 			default:
-				mstr = xm_string_ref(xstr);
+				mstr = xm_string_ref (xstr);
 				break;
 		}
 
-		coll = xmmsv_coll_new(binary_op);
-		xmmsv_coll_attribute_set(coll, "field", property);
-		xmmsv_coll_attribute_set(coll, "value", mstr->value);
-		xm_string_unref(mstr);
-		coll_append_universe(coll);
+		coll = xmmsv_coll_new (binary_op);
+		xmmsv_coll_attribute_set (coll, "field", property);
+		xmmsv_coll_attribute_set (coll, "value", mstr->value);
+		xm_string_unref (mstr);
+		coll_append_universe (coll);
 	} else {
-		m1 = xm_build_binary(ctx, binary_op, "artist", xstr);
-		m2 = xm_build_binary(ctx, binary_op, "album", xstr);
-		m3 = xm_build_binary(ctx, binary_op, "title", xstr);
-		coll = xm_build_union(ctx, m1, m2);
-		coll = xm_build_union(ctx, coll, m3);
+		m1 = xm_build_binary (ctx, binary_op, "artist", xstr);
+		m2 = xm_build_binary (ctx, binary_op, "album", xstr);
+		m3 = xm_build_binary (ctx, binary_op, "title", xstr);
+		coll = xm_build_union (ctx, m1, m2);
+		coll = xm_build_union (ctx, coll, m3);
 		/* m1, m2, m3 already dereferenced ! */
 	}
 	return coll;
 }
 
 xm_string_t *
-xm_property_get_from_short(xm_context_t *ctx, xm_string_t *p)
+xm_property_get_from_short (xm_context_t *ctx, xm_string_t *p)
 {
 	const xm_coll_prop_t *iter;
 	const char *prop_name = p->value;
@@ -297,5 +297,5 @@ xm_property_get_from_short(xm_context_t *ctx, xm_string_t *p)
 		}
 	}
 
-	return xm_context_string_new(ctx, XM_STRING_TYPE_STRING, prop_name);
+	return xm_context_string_new (ctx, XM_STRING_TYPE_STRING, prop_name);
 }

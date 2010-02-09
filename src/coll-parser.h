@@ -12,17 +12,17 @@
  *  Lesser General Public License for more details.
  */
 
-#ifndef COLL_PARSER_H
-#define COLL_PARSER_H
+#ifndef XM_COLL_PARSER_H
+#define XM_COLL_PARSER_H
 
 /* #include <unistd.h> */
 #include <stddef.h>
 #include "xmmsc/xmmsv.h"
 
 xmmsv_t *
-xm_coll_compile_pattern(const char *pattern);
+xm_coll_compile_pattern (const char *pattern);
 
 int
-xm_coll_check_pattern(const char *pattern, xmmsv_t **error);
+xm_coll_check_pattern (const char *pattern, xmmsv_t **error);
 
-#endif /* COLL_PARSER_H */
+#endif /* XM_COLL_PARSER_H */
