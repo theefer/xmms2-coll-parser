@@ -71,14 +71,12 @@ xm_build_and_or (xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
 	xmmsv_coll_t *coll;
 
 	if (xmmsv_coll_get_type (act_op) == type) {
-		coll = act_op;
+		coll = xmmsv_coll_ref(act_op);
 	} else {
 		coll = xmmsv_coll_new (type);
 		xmmsv_coll_add_operand (coll, act_op);
-		xmmsv_coll_unref (act_op);
 	}
 	xmmsv_coll_add_operand (coll, op);
-	xmmsv_coll_unref (op);
 
 	return coll;
 }
@@ -137,7 +135,6 @@ xm_build_complement (xm_context_t *ctx, xmmsv_coll_t *expr)
 
 	coll = xmmsv_coll_new (XMMS_COLLECTION_TYPE_COMPLEMENT);
 	xmmsv_coll_add_operand (coll, expr);
-	xmmsv_coll_unref (expr);
 
 	return coll;
 }
@@ -279,7 +276,9 @@ xm_build_binary (xm_context_t *ctx, xmmsv_coll_type_t binary_op,
 		m3 = xm_build_binary (ctx, binary_op, "title", xstr);
 		coll = xm_build_union (ctx, m1, m2);
 		coll = xm_build_union (ctx, coll, m3);
-		/* m1, m2, m3 already dereferenced ! */
+    xmmsv_coll_unref(m1);
+    xmmsv_coll_unref(m2);
+    xmmsv_coll_unref(m3);
 	}
 	return coll;
 }

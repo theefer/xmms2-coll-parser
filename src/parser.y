@@ -66,7 +66,6 @@ xm_yylex (YYSTYPE *lval, YYLTYPE *lloc, void*scanner);
 	(xm_context_boxed_new (context, (coll), (xm_destroy_func) xmmsv_coll_unref))
 
 #define COLL(boxed) ((xmmsv_coll_t *)((boxed)->data))
-#define COLLREF(boxed) (xmmsv_coll_ref (COLL (boxed)))
 %}
 
 %%
@@ -86,7 +85,7 @@ operation :
 
 or_op :
 	or_op TOKEN_OPSET_OR and_op {
-		$$ = XM_BOX (xm_build_union (context, COLLREF ($1), COLLREF ($3)));
+		$$ = XM_BOX (xm_build_union (context, COLL ($1), COLL ($3)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($3);
 	}
@@ -97,12 +96,12 @@ or_op :
 
 and_op :
 	and_op expr {
-		$$ = XM_BOX (xm_build_union (context, COLLREF ($1), COLLREF ($2)));
+		$$ = XM_BOX (xm_build_union (context, COLL ($1), COLL ($2)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($2);
 	}
 |	and_op TOKEN_OPSET_AND expr {
-		$$ = XM_BOX (xm_build_intersection (context, COLLREF ($1), COLLREF ($3)));
+		$$ = XM_BOX (xm_build_intersection (context, COLL ($1), COLL ($3)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($3);
 	}
@@ -123,7 +122,7 @@ expr :
 		$$ = $2;
 	}
 |	TOKEN_OPSET_NOT expr {
-		$$ = XM_BOX (xm_build_complement (context, COLLREF ($2)));
+		$$ = XM_BOX (xm_build_complement (context, COLL ($2)));
 		xm_boxed_unref ($2);
 	}
 |	TOKEN_REFERENCE string {
