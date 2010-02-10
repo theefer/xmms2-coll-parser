@@ -15,7 +15,7 @@ Requirements
 ------------
 
   - The xmmsclient library
-  - Bison and Flex
+  - Bison and Flex (required only if you want to patch .y or .l files.)
   - python 2.5+ (for the WAF build system)
 
 Compilation
@@ -62,7 +62,7 @@ for real queries. Suspected issues are the following:
     of the original parser, except if support for literal */? in MATCH patterns
     is added in XMMS2.
 
-  - in:* does not match Universe
+  - * alone does not match Universe
 
 
 Wishlist
