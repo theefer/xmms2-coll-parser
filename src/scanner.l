@@ -121,6 +121,10 @@ NOPFILSP  [^:~<>[:space:]]
 	return TOKEN_PROP_LONG;
 }
 
+<INITIAL>[*]/{SP}+ {
+	return TOKEN_UNIVERSE;
+}
+
 <INITIAL>""/. {
 	/* Default case: If no token matches, assume it is a string or a pattern. */
 	BEGIN (string);

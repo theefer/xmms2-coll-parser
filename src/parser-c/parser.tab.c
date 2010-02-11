@@ -134,7 +134,8 @@
      TOKEN_OPSET_NOT = 277,
      TOKEN_IDSEQ_RANGE = 278,
      TOKEN_IDSEQ_SEP = 279,
-     TOKEN_ERR = 280
+     TOKEN_UNIVERSE = 280,
+     TOKEN_ERR = 281
    };
 #endif
 
@@ -155,7 +156,7 @@ typedef union YYSTYPE
 
 
 /* Line 214 of yacc.c  */
-#line 159 "parser.tab.c"
+#line 160 "parser.tab.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -179,7 +180,7 @@ typedef struct YYLTYPE
 /* Copy the second part of user declarations.  */
 
 /* Line 264 of yacc.c  */
-#line 58 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 59 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
 
 void
 xm_yyerror (YYLTYPE *locp, xm_context_t *ctx, void *scanner, const char *msg);
@@ -194,7 +195,7 @@ xm_yylex (YYSTYPE *lval, YYLTYPE *lloc, void*scanner);
 
 
 /* Line 264 of yacc.c  */
-#line 198 "parser.tab.c"
+#line 199 "parser.tab.c"
 
 #ifdef short
 # undef short
@@ -409,22 +410,22 @@ union yyalloc
 #endif
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  33
+#define YYFINAL  34
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   61
+#define YYLAST   66
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  26
+#define YYNTOKENS  27
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  15
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  38
+#define YYNRULES  39
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  59
+#define YYNSTATES  60
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   280
+#define YYMAXUTOK   281
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -460,7 +461,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25
+      25,    26
 };
 
 #if YYDEBUG
@@ -469,34 +470,34 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     5,     7,    11,    13,    16,    20,    22,
-      24,    26,    30,    33,    36,    38,    40,    42,    45,    49,
-      53,    57,    61,    65,    69,    72,    75,    77,    79,    81,
-      83,    85,    87,    89,    91,    94,    98,   100,   104
+      24,    26,    30,    33,    36,    38,    40,    42,    44,    47,
+      51,    55,    59,    63,    67,    71,    74,    77,    79,    81,
+      83,    85,    87,    89,    91,    93,    96,   100,   102,   106
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      27,     0,    -1,    28,    -1,    29,    -1,    29,    20,    30,
-      -1,    30,    -1,    30,    31,    -1,    30,    21,    31,    -1,
-      31,    -1,    38,    -1,    32,    -1,     9,    28,    10,    -1,
-      22,    31,    -1,    13,    37,    -1,    33,    -1,    34,    -1,
-      37,    -1,    12,    35,    -1,    35,    14,    37,    -1,    35,
-      15,    37,    -1,    35,    16,    36,    -1,    35,    17,    36,
-      -1,    35,    18,    36,    -1,    35,    19,    36,    -1,    14,
-      37,    -1,    15,    37,    -1,     4,    -1,     5,    -1,     6,
-      -1,     7,    -1,     8,    -1,     6,    -1,     7,    -1,     8,
-      -1,    11,    39,    -1,    39,    24,    40,    -1,    40,    -1,
-       3,    23,     3,    -1,     3,    -1
+      28,     0,    -1,    29,    -1,    30,    -1,    30,    20,    31,
+      -1,    31,    -1,    31,    32,    -1,    31,    21,    32,    -1,
+      32,    -1,    39,    -1,    33,    -1,     9,    29,    10,    -1,
+      22,    32,    -1,    13,    38,    -1,    25,    -1,    34,    -1,
+      35,    -1,    38,    -1,    12,    36,    -1,    36,    14,    38,
+      -1,    36,    15,    38,    -1,    36,    16,    37,    -1,    36,
+      17,    37,    -1,    36,    18,    37,    -1,    36,    19,    37,
+      -1,    14,    38,    -1,    15,    38,    -1,     4,    -1,     5,
+      -1,     6,    -1,     7,    -1,     8,    -1,     6,    -1,     7,
+      -1,     8,    -1,    11,    40,    -1,    40,    24,    41,    -1,
+      41,    -1,     3,    23,     3,    -1,     3,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    74,    74,    81,    87,    92,    98,   103,   108,   114,
-     118,   121,   124,   128,   135,   138,   141,   148,   155,   160,
-     165,   170,   175,   180,   185,   189,   197,   201,   207,   212,
-     217,   222,   225,   228,   234,   240,   244,   250,   253
+       0,    75,    75,    82,    88,    93,    99,   104,   109,   115,
+     119,   122,   125,   129,   133,   139,   142,   145,   152,   159,
+     164,   169,   174,   179,   184,   189,   193,   201,   205,   211,
+     216,   221,   226,   229,   232,   238,   244,   248,   254,   257
 };
 #endif
 
@@ -511,10 +512,10 @@ static const char *const yytname[] =
   "TOKEN_OPFIL_HAS", "TOKEN_REFERENCE", "TOKEN_OPFIL_EQ",
   "TOKEN_OPFIL_MATCH", "TOKEN_OPFIL_LE", "TOKEN_OPFIL_GE",
   "TOKEN_OPFIL_LT", "TOKEN_OPFIL_GT", "TOKEN_OPSET_OR", "TOKEN_OPSET_AND",
-  "TOKEN_OPSET_NOT", "TOKEN_IDSEQ_RANGE", "TOKEN_IDSEQ_SEP", "TOKEN_ERR",
-  "$accept", "s", "operation", "or_op", "and_op", "expr", "filter",
-  "unary_filter", "binary_filter", "property", "integer", "string",
-  "sequence", "sequence_rev", "seqrange", 0
+  "TOKEN_OPSET_NOT", "TOKEN_IDSEQ_RANGE", "TOKEN_IDSEQ_SEP",
+  "TOKEN_UNIVERSE", "TOKEN_ERR", "$accept", "s", "operation", "or_op",
+  "and_op", "expr", "filter", "unary_filter", "binary_filter", "property",
+  "integer", "string", "sequence", "sequence_rev", "seqrange", 0
 };
 #endif
 
@@ -525,26 +526,26 @@ static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
-     275,   276,   277,   278,   279,   280
+     275,   276,   277,   278,   279,   280,   281
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    26,    27,    28,    29,    29,    30,    30,    30,    31,
-      31,    31,    31,    31,    32,    32,    32,    33,    34,    34,
-      34,    34,    34,    34,    34,    34,    35,    35,    36,    36,
-      36,    37,    37,    37,    38,    39,    39,    40,    40
+       0,    27,    28,    29,    30,    30,    31,    31,    31,    32,
+      32,    32,    32,    32,    32,    33,    33,    33,    34,    35,
+      35,    35,    35,    35,    35,    35,    35,    36,    36,    37,
+      37,    37,    38,    38,    38,    39,    40,    40,    41,    41
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     3,     1,     2,     3,     1,     1,
-       1,     3,     2,     2,     1,     1,     1,     2,     3,     3,
-       3,     3,     3,     3,     2,     2,     1,     1,     1,     1,
-       1,     1,     1,     1,     2,     3,     1,     3,     1
+       1,     3,     2,     2,     1,     1,     1,     1,     2,     3,
+       3,     3,     3,     3,     3,     2,     2,     1,     1,     1,
+       1,     1,     1,     1,     1,     2,     3,     1,     3,     1
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -552,19 +553,19 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,    26,    27,    31,    32,    33,     0,     0,     0,     0,
-       0,     0,     0,     0,     2,     3,     5,     8,    10,    14,
-      15,     0,    16,     9,     0,    38,    34,    36,    17,    13,
-      24,    25,    12,     1,     0,     0,     6,     0,     0,     0,
-       0,     0,     0,    11,     0,     0,     4,     7,    18,    19,
-      28,    29,    30,    20,    21,    22,    23,    37,    35
+       0,    27,    28,    32,    33,    34,     0,     0,     0,     0,
+       0,     0,     0,    14,     0,     2,     3,     5,     8,    10,
+      15,    16,     0,    17,     9,     0,    39,    35,    37,    18,
+      13,    25,    26,    12,     1,     0,     0,     6,     0,     0,
+       0,     0,     0,     0,    11,     0,     0,     4,     7,    19,
+      20,    29,    30,    31,    21,    22,    23,    24,    38,    36
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,    13,    14,    15,    16,    17,    18,    19,    20,    21,
-      53,    22,    23,    26,    27
+      -1,    14,    15,    16,    17,    18,    19,    20,    21,    22,
+      54,    23,    24,    27,    28
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -572,19 +573,19 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -13
 static const yytype_int8 yypact[] =
 {
-      31,   -13,   -13,   -13,   -13,   -13,    31,    10,     1,    13,
-      13,    13,    31,    22,   -13,    21,     3,   -13,   -13,   -13,
-     -13,    33,   -13,   -13,    44,    32,    34,   -13,   -13,   -13,
-     -13,   -13,   -13,   -13,    31,    31,   -13,    13,    13,    20,
-      20,    20,    20,   -13,    53,    10,     3,   -13,   -13,   -13,
-     -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13
+      32,   -13,   -13,   -13,   -13,   -13,    32,     1,     2,    14,
+      14,    14,    32,   -13,    23,   -13,    -6,     4,   -13,   -13,
+     -13,   -13,    34,   -13,   -13,    18,    19,     3,   -13,   -13,
+     -13,   -13,   -13,   -13,   -13,    32,    32,   -13,    14,    14,
+      26,    26,    26,    26,   -13,    52,     1,     4,   -13,   -13,
+     -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13,   -13
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -13,   -13,    51,   -13,    25,   -12,   -13,   -13,   -13,    52,
-      -9,    -8,   -13,   -13,    16
+     -13,   -13,    50,   -13,    27,   -12,   -13,   -13,   -13,    53,
+      17,    -8,   -13,   -13,    20
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -594,24 +595,24 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      32,    29,    30,    31,    36,     1,     2,     1,     2,     3,
-       4,     5,     6,    25,     7,     8,     9,    10,    11,     3,
-       4,     5,    33,    47,    35,    12,    50,    51,    52,    48,
-      49,    54,    55,    56,    36,     1,     2,     3,     4,     5,
-       6,    34,     7,     8,     9,    10,    11,    37,    38,    39,
-      40,    41,    42,    12,    43,    44,    57,    24,    45,    46,
-      28,    58
+      33,    30,    31,    32,    26,    37,     1,     2,     1,     2,
+       3,     4,     5,     6,    35,     7,     8,     9,    10,    11,
+       3,     4,     5,    34,    48,    36,    12,    46,    44,    13,
+      49,    50,    51,    52,    53,    37,     1,     2,     3,     4,
+       5,     6,    45,     7,     8,     9,    10,    11,    38,    39,
+      40,    41,    42,    43,    12,    58,    25,    13,    55,    56,
+      57,    29,    47,     0,     0,     0,    59
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-      12,     9,    10,    11,    16,     4,     5,     4,     5,     6,
-       7,     8,     9,     3,    11,    12,    13,    14,    15,     6,
-       7,     8,     0,    35,    21,    22,     6,     7,     8,    37,
-      38,    40,    41,    42,    46,     4,     5,     6,     7,     8,
-       9,    20,    11,    12,    13,    14,    15,    14,    15,    16,
-      17,    18,    19,    22,    10,    23,     3,     6,    24,    34,
-       8,    45
+      12,     9,    10,    11,     3,    17,     4,     5,     4,     5,
+       6,     7,     8,     9,    20,    11,    12,    13,    14,    15,
+       6,     7,     8,     0,    36,    21,    22,    24,    10,    25,
+      38,    39,     6,     7,     8,    47,     4,     5,     6,     7,
+       8,     9,    23,    11,    12,    13,    14,    15,    14,    15,
+      16,    17,    18,    19,    22,     3,     6,    25,    41,    42,
+      43,     8,    35,    -1,    -1,    -1,    46
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -619,11 +620,11 @@ static const yytype_uint8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     4,     5,     6,     7,     8,     9,    11,    12,    13,
-      14,    15,    22,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    37,    38,    28,     3,    39,    40,    35,    37,
-      37,    37,    31,     0,    20,    21,    31,    14,    15,    16,
-      17,    18,    19,    10,    23,    24,    30,    31,    37,    37,
-       6,     7,     8,    36,    36,    36,    36,     3,    40
+      14,    15,    22,    25,    28,    29,    30,    31,    32,    33,
+      34,    35,    36,    38,    39,    29,     3,    40,    41,    36,
+      38,    38,    38,    32,     0,    20,    21,    32,    14,    15,
+      16,    17,    18,    19,    10,    23,    24,    31,    32,    38,
+      38,     6,     7,     8,    37,    37,    37,    37,     3,    41
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1484,7 +1485,7 @@ yyreduce:
         case 2:
 
 /* Line 1455 of yacc.c  */
-#line 74 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 75 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		xm_context_store_result (context, COLL((yyvsp[(1) - (1)].coll)));
 		xm_boxed_unref((yyvsp[(1) - (1)].coll));
@@ -1494,7 +1495,7 @@ yyreduce:
   case 3:
 
 /* Line 1455 of yacc.c  */
-#line 81 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 82 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
@@ -1503,7 +1504,7 @@ yyreduce:
   case 4:
 
 /* Line 1455 of yacc.c  */
-#line 87 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 88 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_union (context, COLL ((yyvsp[(1) - (3)].coll)), COLL ((yyvsp[(3) - (3)].coll))));
 		xm_boxed_unref ((yyvsp[(1) - (3)].coll));
@@ -1514,7 +1515,7 @@ yyreduce:
   case 5:
 
 /* Line 1455 of yacc.c  */
-#line 92 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 93 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
@@ -1523,7 +1524,7 @@ yyreduce:
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 98 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 99 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_union (context, COLL ((yyvsp[(1) - (2)].coll)), COLL ((yyvsp[(2) - (2)].coll))));
 		xm_boxed_unref ((yyvsp[(1) - (2)].coll));
@@ -1534,7 +1535,7 @@ yyreduce:
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 103 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 104 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_intersection (context, COLL ((yyvsp[(1) - (3)].coll)), COLL ((yyvsp[(3) - (3)].coll))));
 		xm_boxed_unref ((yyvsp[(1) - (3)].coll));
@@ -1545,7 +1546,7 @@ yyreduce:
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 108 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 109 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
@@ -1554,7 +1555,7 @@ yyreduce:
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 114 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 115 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_idlist (context, (yyvsp[(1) - (1)].seq)));
 		xm_sequence_destroy ((yyvsp[(1) - (1)].seq));
@@ -1564,7 +1565,7 @@ yyreduce:
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 118 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 119 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
@@ -1573,7 +1574,7 @@ yyreduce:
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 121 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 122 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(2) - (3)].coll);
 	;}
@@ -1582,7 +1583,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 124 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 125 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_complement (context, COLL ((yyvsp[(2) - (2)].coll))));
 		xm_boxed_unref ((yyvsp[(2) - (2)].coll));
@@ -1592,7 +1593,7 @@ yyreduce:
   case 13:
 
 /* Line 1455 of yacc.c  */
-#line 128 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 129 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = XM_BOX (xm_build_reference (context, (yyvsp[(2) - (2)].xstr)->value));
 		xm_string_unref ((yyvsp[(2) - (2)].xstr));
@@ -1602,16 +1603,16 @@ yyreduce:
   case 14:
 
 /* Line 1455 of yacc.c  */
-#line 135 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 133 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = (yyvsp[(1) - (1)].coll);
+		(yyval.coll) = XM_BOX (xm_build_universe (context));
 	;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 138 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 139 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
@@ -1620,40 +1621,38 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 141 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 142 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, NULL, (yyvsp[(1) - (1)].xstr)));
-		xm_string_unref ((yyvsp[(1) - (1)].xstr));
+		(yyval.coll) = (yyvsp[(1) - (1)].coll);
 	;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 148 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 145 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_unary (context, XMMS_COLLECTION_TYPE_HAS, (yyvsp[(2) - (2)].xstr)->value));
-		xm_string_unref ((yyvsp[(2) - (2)].xstr));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, NULL, (yyvsp[(1) - (1)].xstr)));
+		xm_string_unref ((yyvsp[(1) - (1)].xstr));
 	;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 155 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 152 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
-		xm_string_unref ((yyvsp[(1) - (3)].xstr));
-		xm_string_unref ((yyvsp[(3) - (3)].xstr));
+		(yyval.coll) = XM_BOX (xm_build_unary (context, XMMS_COLLECTION_TYPE_HAS, (yyvsp[(2) - (2)].xstr)->value));
+		xm_string_unref ((yyvsp[(2) - (2)].xstr));
 	;}
     break;
 
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 160 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 159 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_MATCH, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
 		xm_string_unref ((yyvsp[(1) - (3)].xstr));
 		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
@@ -1662,9 +1661,9 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 165 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 164 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary_e (context, XMMS_COLLECTION_TYPE_SMALLER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_MATCH, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
 		xm_string_unref ((yyvsp[(1) - (3)].xstr));
 		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
@@ -1673,9 +1672,9 @@ yyreduce:
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 170 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 169 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary_e (context, XMMS_COLLECTION_TYPE_GREATER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary_e (context, XMMS_COLLECTION_TYPE_SMALLER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
 		xm_string_unref ((yyvsp[(1) - (3)].xstr));
 		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
@@ -1684,9 +1683,9 @@ yyreduce:
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 175 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 174 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_SMALLER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary_e (context, XMMS_COLLECTION_TYPE_GREATER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
 		xm_string_unref ((yyvsp[(1) - (3)].xstr));
 		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
@@ -1695,9 +1694,9 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 180 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 179 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_GREATER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_SMALLER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
 		xm_string_unref ((yyvsp[(1) - (3)].xstr));
 		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
@@ -1706,10 +1705,11 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 185 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 184 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, NULL, (yyvsp[(2) - (2)].xstr)));
-		xm_string_unref ((yyvsp[(2) - (2)].xstr));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_GREATER, (yyvsp[(1) - (3)].xstr)->value, (yyvsp[(3) - (3)].xstr)));
+		xm_string_unref ((yyvsp[(1) - (3)].xstr));
+		xm_string_unref ((yyvsp[(3) - (3)].xstr));
 	;}
     break;
 
@@ -1718,8 +1718,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 189 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		/* TODO: use appropriate enum value for filter. */
-		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_MATCH, NULL, (yyvsp[(2) - (2)].xstr)));
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_EQUALS, NULL, (yyvsp[(2) - (2)].xstr)));
 		xm_string_unref ((yyvsp[(2) - (2)].xstr));
 	;}
     break;
@@ -1727,10 +1726,11 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 197 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 193 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.xstr) = xm_property_get_from_short (context, (yyvsp[(1) - (1)].xstr));
-		xm_string_unref ((yyvsp[(1) - (1)].xstr));
+		/* TODO: use appropriate enum value for filter. */
+		(yyval.coll) = XM_BOX (xm_build_binary (context, XMMS_COLLECTION_TYPE_MATCH, NULL, (yyvsp[(2) - (2)].xstr)));
+		xm_string_unref ((yyvsp[(2) - (2)].xstr));
 	;}
     break;
 
@@ -1739,25 +1739,24 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 201 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
+		(yyval.xstr) = xm_property_get_from_short (context, (yyvsp[(1) - (1)].xstr));
+		xm_string_unref ((yyvsp[(1) - (1)].xstr));
 	;}
     break;
 
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 207 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 205 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		xm_yyerror (&xm_yylloc, context, scanner, XM_ERROR_SEMANTIC_NOT_INTEGER);
-		xm_string_unref ((yyvsp[(1) - (1)].xstr));
-		YYERROR;
+		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
 	;}
     break;
 
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 212 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 211 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		xm_yyerror (&xm_yylloc, context, scanner, XM_ERROR_SEMANTIC_NOT_INTEGER);
 		xm_string_unref ((yyvsp[(1) - (1)].xstr));
@@ -1768,16 +1767,18 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 217 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 216 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
+		xm_yyerror (&xm_yylloc, context, scanner, XM_ERROR_SEMANTIC_NOT_INTEGER);
+		xm_string_unref ((yyvsp[(1) - (1)].xstr));
+		YYERROR;
 	;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 222 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 221 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
 	;}
@@ -1786,7 +1787,7 @@ yyreduce:
   case 32:
 
 /* Line 1455 of yacc.c  */
-#line 225 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 226 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
 	;}
@@ -1795,7 +1796,7 @@ yyreduce:
   case 33:
 
 /* Line 1455 of yacc.c  */
-#line 228 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 229 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
 	;}
@@ -1804,19 +1805,18 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 234 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 232 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.seq) = xm_sequence_reverse ((yyvsp[(2) - (2)].seq));
+		(yyval.xstr) = (yyvsp[(1) - (1)].xstr);
 	;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 240 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 238 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		/* It is faster to build the sequence in reverse order. */
-		(yyval.seq) = xm_sequence_prepend ((yyvsp[(1) - (3)].seq), (yyvsp[(3) - (3)].seq));
+		(yyval.seq) = xm_sequence_reverse ((yyvsp[(2) - (2)].seq));
 	;}
     break;
 
@@ -1825,23 +1825,33 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 244 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.seq) = (yyvsp[(1) - (1)].seq);
+		/* It is faster to build the sequence in reverse order. */
+		(yyval.seq) = xm_sequence_prepend ((yyvsp[(1) - (3)].seq), (yyvsp[(3) - (3)].seq));
 	;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 250 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 248 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.seq) = xm_context_sequence_new_range (context, (yyvsp[(1) - (3)].ival), (yyvsp[(3) - (3)].ival));
+		(yyval.seq) = (yyvsp[(1) - (1)].seq);
 	;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 253 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 254 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+    {
+		(yyval.seq) = xm_context_sequence_new_range (context, (yyvsp[(1) - (3)].ival), (yyvsp[(3) - (3)].ival));
+	;}
+    break;
+
+  case 39:
+
+/* Line 1455 of yacc.c  */
+#line 257 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
 		(yyval.seq) = xm_context_sequence_new_range (context, (yyvsp[(1) - (1)].ival), (yyvsp[(1) - (1)].ival));
 	;}
@@ -1850,7 +1860,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1854 "parser.tab.c"
+#line 1864 "parser.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2069,7 +2079,7 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 258 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
+#line 262 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
 
 
 /* directly parser-related functions. */

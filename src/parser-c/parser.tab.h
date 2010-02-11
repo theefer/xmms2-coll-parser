@@ -61,7 +61,8 @@
      TOKEN_OPSET_NOT = 277,
      TOKEN_IDSEQ_RANGE = 278,
      TOKEN_IDSEQ_SEP = 279,
-     TOKEN_ERR = 280
+     TOKEN_UNIVERSE = 280,
+     TOKEN_ERR = 281
    };
 #endif
 
@@ -82,7 +83,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 86 "parser.tab.h"
+#line 87 "parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

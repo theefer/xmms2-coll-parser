@@ -35,6 +35,9 @@ xmmsv_coll_t *
 xm_build_reference (xm_context_t *ctx, const char *refname);
 
 xmmsv_coll_t *
+xm_build_universe (xm_context_t *ctx);
+
+xmmsv_coll_t *
 xm_build_idlist (xm_context_t *ctx, xm_sequence_t *seq);
 
 xmmsv_coll_t *

@@ -46,6 +46,7 @@
 %token TOKEN_OPFIL_LT TOKEN_OPFIL_GT
 %token TOKEN_OPSET_OR TOKEN_OPSET_AND TOKEN_OPSET_NOT
 %token TOKEN_IDSEQ_RANGE TOKEN_IDSEQ_SEP
+%token TOKEN_UNIVERSE
 
 %token TOKEN_ERR
 
@@ -128,6 +129,9 @@ expr :
 |	TOKEN_REFERENCE string {
 		$$ = XM_BOX (xm_build_reference (context, $2->value));
 		xm_string_unref ($2);
+	}
+|	TOKEN_UNIVERSE {
+		$$ = XM_BOX (xm_build_universe (context));
 	}
 ;
 
