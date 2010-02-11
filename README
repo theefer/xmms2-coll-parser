@@ -52,17 +52,8 @@ Differences with the original collection parser
 Issues
 ======
 
-At this stage, collection structures produced by the parser have not been tested
-for real queries. Suspected issues are the following:
+Feel free to report issues at http://github.com/vdust/xmms2-coll-parser/issues
 
-  - A combination of quoted and non-quoted * and ?, makes all * and ?
-    glob characters.
-      e.g.   foo:'foo*bar'?   is equivalent to   foo~foo*bar?
-    The behavior of quoted */? might change in the future to match the behavior
-    of the original parser, except if support for literal */? in MATCH patterns
-    is added in XMMS2.
-
-  - * alone does not match Universe
 
 
 Wishlist
