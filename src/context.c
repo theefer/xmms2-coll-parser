@@ -122,7 +122,12 @@ xm_context_string_buffer_append_str (xm_context_t *ctx, const char *str)
 {
 	xm_string_append (ctx->scan_str, str);
 	if (ctx->scan_str->type != XM_STRING_TYPE_PATTERN) {
-		ctx->scan_str->type = XM_STRING_TYPE_STRING;
+		if (strchr (str, '*') || strchr (str, '?')) {
+			/* Forces inquotes * or ? to be special chars. */
+			ctx->scan_str->type = XM_STRING_TYPE_PATTERN;
+		} else {
+			ctx->scan_str->type = XM_STRING_TYPE_STRING;
+		}
 	}
 }
 
