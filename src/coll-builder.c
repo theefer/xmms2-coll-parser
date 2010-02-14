@@ -68,7 +68,9 @@ static xmmsv_coll_t *
 xm_build_and_or (xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
                  xmmsv_coll_type_t type)
 {
-	xmmsv_coll_t *coll;
+	xmmsv_coll_t *coll, *coll2;
+	xmmsv_t *operands;
+	xmmsv_list_iter_t *iter;
 
 	if (xmmsv_coll_get_type (act_op) == type) {
 		coll = xmmsv_coll_ref(act_op);
@@ -76,7 +78,20 @@ xm_build_and_or (xm_context_t *ctx, xmmsv_coll_t *act_op, xmmsv_coll_t *op,
 		coll = xmmsv_coll_new (type);
 		xmmsv_coll_add_operand (coll, act_op);
 	}
-	xmmsv_coll_add_operand (coll, op);
+	if (xmmsv_coll_get_type (op) == type) {
+		operands = xmmsv_coll_operands_get (op);
+		xmmsv_get_list_iter (operands, &iter);
+		while (xmmsv_list_iter_valid(iter)) {
+			xmmsv_list_iter_entry_coll(iter, &coll2);
+			xmmsv_coll_ref(coll2);
+			xmmsv_list_iter_remove(iter);
+			xmmsv_coll_add_operand (coll, coll2);
+			xmmsv_coll_unref(coll2);
+		}
+		xmmsv_list_iter_explicit_destroy (iter);
+	} else {
+		xmmsv_coll_add_operand (coll, op);
+	}
 
 	return coll;
 }

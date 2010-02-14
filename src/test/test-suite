@@ -18,6 +18,9 @@ fo:foo AND br:bar
 fo:foo AND br:bar AND bz:baz
 fo:foo OR br:bar AND bz:baz
 fo:foo AND br:bar OR bz:baz
+fo:foo AND ( br:bar OR bz:baz )
+fo:foo OR ( br:bar OR bz:baz )
+( fo:foo AND br:bar ) AND bz:baz
 foo<10
 foo<=10
 foo>10

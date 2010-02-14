@@ -48,15 +48,3 @@ Wished extensions and improvements:
         Equals ('title', 'foo') for:
           Reference: 'All Media'
 
-    artist:foo OR ( @Foo artist:Baz OR title~foobar ) OR title:bar
-    =>
-      Union:
-        Equals ('artist', 'foo') for:
-          Reference: 'All Media'
-        Equals ('artist', 'Baz') for:
-          Reference: 'Collections/Foo'
-        Match ('title', '*foobar*') for:
-          Reference: 'Collections/Foo'
-        Equals ('title', 'bar') for:
-          Reference: 'All Media'
-
