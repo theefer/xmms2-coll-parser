@@ -2095,11 +2095,11 @@ xm_yyerror (YYLTYPE *locp, xm_context_t *ctx, void *scanner, const char *msg)
 	}
 
 	l = snprintf (&test, 1, XM_ERROR_DEFAULT_FORMAT,
-	              locp->last_line, locp->last_column, msg);
+	              locp->first_line, locp->first_column, msg);
 	if (l > 0) {
 		ctx->error = malloc (l + 1);
 		snprintf (ctx->error, l + 1, XM_ERROR_DEFAULT_FORMAT,
-		          locp->last_line, locp->last_column, msg);
+		          locp->first_line, locp->first_column, msg);
 	} else { /* We need to report an error no matter what. */
 		ctx->error = strdup ("Unexpected error");
 	}

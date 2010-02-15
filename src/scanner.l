@@ -30,6 +30,9 @@
 # undef YY_BREAK
 #endif
 #define YY_BREAK
+
+static void
+xm_set_loc (YYLTYPE *llocp, const char *data);
 %}
 
 %x has
@@ -51,81 +54,100 @@ NOPFILSP  [^:~<>[:space:]]
 %%
 
 <INITIAL>{SP}+ {
+	xm_set_loc(yylloc, yytext);
 	break;
 }
 <INITIAL>"(" {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_GROUP_OPEN;
 }
 <INITIAL>")" {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_GROUP_CLOSE;
 }
 <INITIAL>"#" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (idseq);
 	return TOKEN_SYMBOL_ID;
 }
 <INITIAL>"+"/{NSP} {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (has);
 	return TOKEN_OPFIL_HAS;
 }
 <INITIAL>":" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_EQ;
 }
 <INITIAL>"~" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_MATCH;
 }
 <INITIAL>"<=" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_LE;
 }
 <INITIAL>">=" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_GE;
 }
 <INITIAL>"<" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_LT;
 }
 <INITIAL>">" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_OPFIL_GT;
 }
 <INITIAL>"OR"/{SP} {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_OPSET_OR;
 }
 <INITIAL>"AND"/{SP} {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_OPSET_AND;
 }
 <INITIAL>"NOT"/{SP} {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_OPSET_NOT;
 }
 <INITIAL>"in:" {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
 	return TOKEN_REFERENCE;
 }
 
 <INITIAL>[a-z]/{OPFIL} {
+	xm_set_loc(yylloc, yytext);
 	yylval->xstr = xm_context_string_new (yyextra, XM_STRING_TYPE_STRING, yytext);
 	return TOKEN_PROP_SHORT;
 }
 <INITIAL>[[:alnum:]_-]+/{OPFIL} {
+	xm_set_loc(yylloc, yytext);
 	yylval->xstr = xm_context_string_new (yyextra, XM_STRING_TYPE_STRING, yytext);
 	return TOKEN_PROP_LONG;
 }
 
-<INITIAL>[*]/{SP}+ {
+<INITIAL>[*]/{SP} {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_UNIVERSE;
 }
 
 <INITIAL>""/. {
+	xm_set_loc(yylloc, yytext);
 	/* Default case: If no token matches, assume it is a string or a pattern. */
 	BEGIN (string);
 	xm_context_string_buffer_init (yyextra);
@@ -133,72 +155,87 @@ NOPFILSP  [^:~<>[:space:]]
 }
 
 <has>[a-z]/{SP} {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (INITIAL);
 	yylval->xstr = xm_context_string_new (yyextra, XM_STRING_TYPE_STRING, yytext);
 	return TOKEN_PROP_SHORT;
 }
 
 <has>[[:alnum:]_-]+/{SP} {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (INITIAL);
 	yylval->xstr = xm_context_string_new (yyextra, XM_STRING_TYPE_STRING, yytext);
 	return TOKEN_PROP_LONG;
 }
 
 <idseq>[[:digit:]]+ {
+	xm_set_loc(yylloc, yytext);
 	yylval->ival = (unsigned int) atoi (yytext);
 	return TOKEN_INTEGER;
 }
 <idseq>"-" {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_IDSEQ_RANGE;
 }
 <idseq>"," {
+	xm_set_loc(yylloc, yytext);
 	return TOKEN_IDSEQ_SEP;
 }
-<idseq>{SP}+ {
+<idseq>""/{SP} {
 	BEGIN (INITIAL);
 	break;
 }
 
 <string>["] {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (stringQ);
 	break;
 }
 <string>['] {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (stringSQ);
 	break;
 }
 <string>[*?] {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_patchar (yyextra, yytext);
 	break;
 }
 <string>[[:digit:]]+ {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_digits (yyextra, yytext);
 	break;
 }
 <string>{STRNQ}+ {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_str (yyextra, yytext);
 	break;
 }
 <stringQ,stringSQ>[[:digit:]]+/["'] {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_digits (yyextra, yytext);
 	break;
 }
 <stringQ>["] {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	break; }
 <stringQ>{STRQ}*/["] {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_str (yyextra, yytext);
 	break;
 }
 <stringSQ>['] {
+	xm_set_loc(yylloc, yytext);
 	BEGIN (string);
 	break;
 }
 <stringSQ>{STRSQ}*/['] {
+	xm_set_loc(yylloc, yytext);
 	xm_context_string_buffer_append_str (yyextra, yytext);
 	break;
 }
-<string,stringQ,stringSQ>{SP}+ {
+<string,stringQ,stringSQ>""/{SP} {
 	BEGIN(INITIAL);
 	yylval->xstr = xm_context_string_buffer_ref (yyextra);
 	xm_context_string_buffer_init (yyextra);
@@ -219,6 +256,20 @@ NOPFILSP  [^:~<>[:space:]]
 <*>. { return TOKEN_ERR; }
 
 %%
+
+static void
+xm_set_loc (YYLTYPE *llocp, const char *data)
+{
+	const char *p;
+	llocp->first_line = llocp->last_line;
+	llocp->first_column = llocp->last_column;
+	while ((p = strchr (data, '\n')) != NULL) {
+		data = p+1;
+		llocp->last_line++;
+		llocp->last_column = 1;
+	}
+	llocp->last_column += strlen(data);
+}
 
 void
 xm_context_init_scanner (xm_context_t *context, const char *input)
