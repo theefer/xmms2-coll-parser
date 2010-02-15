@@ -144,6 +144,7 @@ xm_idlist_merge(unsigned int *dest, const uint32_t *l1, size_t s1,
 				dest[k] = l2[j];
 				k++;
 			}
+			i--;
 		}
 	}
 	for (; j < s2; j++) {
