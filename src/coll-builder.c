@@ -128,19 +128,105 @@ xm_idlist_sort(const void *i1, const void *i2)
 	return *((int *)i1) - *((int *)i2);
 }
 
+/* l1 and l2 must be sorted with no dupplicated entries.
+ * (it is the case when an idlist is generated) */
+static void
+xm_idlist_merge(unsigned int *dest, const uint32_t *l1, size_t s1,
+                const uint32_t *l2, size_t s2)
+{
+	int i, j, k;
+	for (i = 0, j = 0, k = 0; i < s1; i++) {
+		if (j >= s2 || l1[i] < l2[j]) {
+			dest[k] = l1[i];
+			k++;
+		} else {
+			for (; j < s2 && l2[j] <= l1[i]; j++) {
+				dest[k] = l2[j];
+				k++;
+			}
+		}
+	}
+	for (; j < s2; j++) {
+		dest[k] = l2[j];
+		k++;
+	}
+	dest[k] = 0;
+}
 
+static xmmsv_coll_t *
+xm_coll_merge_idlists (xmmsv_coll_t *coll)
+{
+	xmmsv_coll_t *coll_idlist, *coll_cur;
+	xmmsv_t *operands;
+	xmmsv_list_iter_t *iter;
+	const uint32_t *ids_main, *ids_cur;
+	unsigned int *ids_new;
+	size_t main_size, new_size, cur_size;
+
+	/* Merge IdLists. */
+	coll_idlist = NULL;
+	coll_cur = NULL;
+	operands = xmmsv_coll_operands_get (coll);
+	xmmsv_get_list_iter (operands, &iter);
+	while (xmmsv_list_iter_valid (iter)) {
+		xmmsv_list_iter_entry_coll (iter, &coll_cur);
+		if (xmmsv_coll_get_type (coll_cur) == XMMS_COLLECTION_TYPE_IDLIST) {
+			if (coll_idlist) {
+				xmmsv_coll_ref (coll_cur);
+				xmmsv_list_iter_remove (iter);
+
+				ids_main = xmmsv_coll_get_idlist (coll_idlist);
+				ids_cur = xmmsv_coll_get_idlist (coll_cur);
+				main_size = xmmsv_coll_idlist_get_size (coll_idlist);
+				cur_size = xmmsv_coll_idlist_get_size (coll_cur);
+				new_size = main_size + cur_size;
+				ids_new = xm_new (unsigned int, new_size + 1);
+
+				xm_idlist_merge (ids_new, ids_main, main_size, ids_cur, cur_size);
+				xmmsv_coll_set_idlist (coll_idlist, ids_new);
+
+				free (ids_new);
+				xmmsv_coll_unref (coll_cur);
+			} else {
+				coll_idlist = coll_cur;
+				xmmsv_list_iter_next (iter);
+			}
+		} else {
+			xmmsv_list_iter_next (iter);
+		}
+	}
+	xmmsv_list_iter_explicit_destroy (iter);
+
+	/* If IDList is alone, remove the parent. */
+	if (xmmsv_list_get_size (operands) == 1) {
+		xmmsv_list_get_coll (operands, 0, &coll_cur);
+		xmmsv_coll_ref (coll_cur);
+		xmmsv_coll_remove_operand (coll, coll_cur);
+		xmmsv_coll_unref (coll);
+		coll = coll_cur;
+	}
+
+	return coll;
+}
 
 xmmsv_coll_t *
 xm_build_union (xm_context_t *ctx, xmmsv_coll_t *or_op, xmmsv_coll_t *and_op)
 {
-	return xm_build_and_or (ctx, or_op, and_op, XMMS_COLLECTION_TYPE_UNION);
+	xmmsv_coll_t *coll;
+
+	coll = xm_build_and_or (ctx, or_op, and_op, XMMS_COLLECTION_TYPE_UNION);
+	coll = xm_coll_merge_idlists (coll);
+
+	return coll;
 }
 
 xmmsv_coll_t *
 xm_build_intersection (xm_context_t *ctx, xmmsv_coll_t *and_op,
                        xmmsv_coll_t *expr)
 {
-	return xm_build_and_or (ctx, and_op, expr, XMMS_COLLECTION_TYPE_INTERSECTION);
+	xmmsv_coll_t *coll;
+	coll = xm_build_and_or (ctx, and_op, expr, XMMS_COLLECTION_TYPE_INTERSECTION);
+	return coll;
 }
 
 xmmsv_coll_t *
