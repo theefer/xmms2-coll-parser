@@ -1,0 +1,201 @@
+.\" 
+.\" XMMS2 Collection parser.
+.\"
+.\" xmpattern.3 - Patterns XMMS2 Collection Parser library
+.\"
+.\" Copyright (C) 2010 Raphaël Bois
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer
+.\"    in this position and unchanged.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. The name of the author may not be used to endorse or promote products
+.\"    derived from this software without specific prior written permission
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+.\" OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+.\" IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+.\" INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+.\" NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+.\" DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+.\" THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+.\" (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+.\" THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\" 
+.TH XMPATTERN 7 "Draft 0.1" "" "Draft 0.1"
+.SH NAME
+xmpattern - Patterns in the XMMS2 Collection Parser library.
+.SH DESCRIPTION
+.PP
+This document discribes the syntax of patterns recognized by the XMMS2
+Collection Parser library. 
+.SH PROPERTIES AND VALUES
+.PP
+Properties and values are used in filters expressions (see \fBFILTERS\fP
+below).
+.SS Properties
+.PP
+A property name can contain alpha-numeric characters and the dash character
+(\fB-\fP). The language provides one-character aliases to common properties:
+.PP
+.PD 0
+.RS
+.TP
+.B a
+artist
+.TP
+.B l
+album
+.TP
+.B t
+title
+.TP
+.B n
+tracknr
+.TP
+.B y
+year
+.TP
+.B g
+genre
+.TP
+.B u
+url
+.RE
+.PD
+.SS Values
+.PP
+A value can contain any character, except for special characters which must be
+quoted in some cases:
+.PP
+.PD 0
+.RS
+.TP
+\fBspaces\fP, \fB'\fP, \fB"\fP
+Must always be quoted.
+.TP
+.BR AND ", " OR ", " NOT
+Must be quoted only when they are the value and the value is used alone.
+.TP
+.BR ( ", " )
+Must be quoted only if they appear at the beginning or at the end of the value.
+.TP
+.B filters
+Must be quoted when the value is used alone.
+.RE
+.PD
+.PP
+The whole value or parts
+of it can be quoted using single quotes (\fB'\fP) or double quotes (\fB"\fP).
+If the value contains quotes, they must be quoted with quotes of the other type.
+.PP
+Some characters have a special meaning even when they appear inside quotes:
+.PP
+.PD 0
+.RS
+.TP
+.B *
+matches 0 or more characters
+.TP
+.B ?
+matches any character
+.RE
+.PD
+.SH OPERATORS
+.PP
+\fIexpr\fP represents any valid pattern. Operators with the highest priority
+are listed first:
+.PP
+.PD 0
+.TP
+.BI "( " expr " )"
+Match all media that match by \fIexpr\fP. Grouping allow to override the
+priority of operators.
+.TP
+.BI "NOT " expr
+Match all media that do not match \fIexpr\fP
+.TP
+.IB expr1 " AND " expr2
+Match all media that match both \fIexpr1\fP and \fIexpr2\fP
+.TP
+.IB expr1 " OR " expr2
+.TP
+.B expr1 expr2
+Match all media that match either \fIexpr1\fP or \fIexpr2\fP
+.PD
+.SH "FILTERS"
+.PP
+.PD 0
+.TP
+.IB \fP[[\fIprop\fP]\fI :\fP]\fB value
+Match all media of which the property \fIprop\fP is equal to \fIvalue\fP.
+If \fIprop\fP is omitted, match all media of which album, artist or title is
+equal to \fIvalue\fP. If \fIprop\fP is omitted, \fI:\fP can also be omitted.
+.TP
+.IB \fP[\fIprop\fP]\fI ~ value
+Match all media of which the property \fIprop\fP contains \fIvalue\fP.
+If \fIprop\fP is omitted, match all media of which album, artist or title
+contains \fIvalue\fP. This is equivalent to \fIprop\fP\fB:\fP*\fIvalue\fP*
+.TP
+.IB prop "<" value
+Match all media of which the property \fIprop\fP is smaller than \fIvalue\fP
+.TP
+.IB prop "<=" value
+Match all media of which the property \fIprop\fP is smaller than or equal to
+\fIvalue\fP
+.TP
+.IB prop ">" value
+Match all media of which the property \fIprop\fP is greater than \fIvalue\fP
+.TP
+.IB prop ">=" value
+Match all media of which the property \fIprop\fP is greater than or equal to
+\fIvalue\fP
+.TP
+.BI in: \fIcoll\fP
+Match all media that are in the collection \fIcoll\fP
+.TP
+.BI + prop
+Match all media which has the property \fIprop\fP
+.TP
+.BI # seq
+Match media of which id appears in the sequence \fIseq\fP. A sequence is a
+comma (\fB,\fP) separated list of ids and ranges. A range is of the form
+\fIfirst\fP\fB-\fP\fIlast\fP
+.PD
+.SH EXAMPLES
+.PP
+Match all media which are part of an album, except for the first tracks
+.RS
+.PP
+\fB+\fPalbum \fBAND\fP \fBNOT\fP tracknr\fB:\fP1
+.br
+.in -3n
+or
+.in
+.br
+\fB+\fPa \fBAND\fP n\fB>\fP1
+.RE
+.sp
+.PP
+Match all media of the years 1999 and 2009, which have a rating property.
+.RS
+.PP
+\fB+\fPrating \fBAND\fP \fB(\fP date\fB:\fP1999 \fBOR\fP date\fB:\fP2009 \fB)\fP
+.RE
+.sp
+.PP
+Match all media of which album, title or artist starts with "The " except for media with ids 42, 84, 168 to 336 and 672.
+.RS
+.PP
+\fB:\fP"The *" \fBAND\fP \fBNOT\fP \fB#\fP42,84,168-336,672
+.RE
+.SH "SEE ALSO"
+.BR xmcollparse (3)
+.SH AUTHOR
+This manual page was written by Raphael Bois <virtualdust@gmail.com>
