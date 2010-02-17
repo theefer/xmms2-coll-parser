@@ -97,7 +97,7 @@ or_op :
 
 and_op :
 	and_op expr {
-		$$ = XM_BOX (xm_build_union (context, COLL ($1), COLL ($2)));
+		$$ = XM_BOX (xm_build_intersection (context, COLL ($1), COLL ($2)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($2);
 	}

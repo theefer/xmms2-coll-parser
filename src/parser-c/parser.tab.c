@@ -1526,7 +1526,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 99 "/home/vdust/developpement/GIT/xm-coll-parser/src/parser.y"
     {
-		(yyval.coll) = XM_BOX (xm_build_union (context, COLL ((yyvsp[(1) - (2)].coll)), COLL ((yyvsp[(2) - (2)].coll))));
+		(yyval.coll) = XM_BOX (xm_build_intersection (context, COLL ((yyvsp[(1) - (2)].coll)), COLL ((yyvsp[(2) - (2)].coll))));
 		xm_boxed_unref ((yyvsp[(1) - (2)].coll));
 		xm_boxed_unref ((yyvsp[(2) - (2)].coll));
 	;}
