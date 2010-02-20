@@ -85,7 +85,12 @@ operation :
 ;
 
 or_op :
-	or_op TOKEN_OPSET_OR and_op {
+	or_op and_op {
+		$$ = XM_BOX (xm_build_union (context, COLL ($1), COLL ($2)));
+		xm_boxed_unref ($1);
+		xm_boxed_unref ($2);
+	}
+|	or_op TOKEN_OPSET_OR and_op {
 		$$ = XM_BOX (xm_build_union (context, COLL ($1), COLL ($3)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($3);
@@ -96,12 +101,7 @@ or_op :
 ;
 
 and_op :
-	and_op expr {
-		$$ = XM_BOX (xm_build_intersection (context, COLL ($1), COLL ($2)));
-		xm_boxed_unref ($1);
-		xm_boxed_unref ($2);
-	}
-|	and_op TOKEN_OPSET_AND expr {
+	and_op TOKEN_OPSET_AND expr {
 		$$ = XM_BOX (xm_build_intersection (context, COLL ($1), COLL ($3)));
 		xm_boxed_unref ($1);
 		xm_boxed_unref ($3);
